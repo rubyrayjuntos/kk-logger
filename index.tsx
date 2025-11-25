@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   Check,
@@ -27,6 +27,8 @@ import {
   User as UserIcon,
   MapPin,
   Wifi,
+  WifiOff,
+  RefreshCw,
   Mail,
   Copy,
   Globe,
@@ -35,7 +37,17 @@ import {
   FileText,
   Download,
   Filter,
-  FileSpreadsheet
+  FileSpreadsheet,
+  CloudOff,
+  CloudLightning,
+  Snowflake,
+  Flame,
+  Soup,
+  CheckCircle, 
+  Circle, 
+  ChevronDown, 
+  ChevronUp,
+  History
 } from 'lucide-react';
 
 // --- TRANSLATIONS ---
@@ -53,9 +65,26 @@ const TRANSLATIONS = {
     
     // Common
     logout: "Logout",
-    online: "ONLINE",
+    online: "Online",
+    offline: "Offline",
+    syncing: "Syncing...",
+    syncError: "Sync Error",
+    pendingLogs: "Pending Logs",
     
-    // Manager
+    // Manager Dashboard New
+    todaysProgress: "Today's Progress",
+    moreAttention: "⚠️ More tasks need attention",
+    makingProgress: "👍 Making progress",
+    almostDone: "🎉 Almost done!",
+    upNext: "Up Next",
+    comingUp: "Coming Up",
+    completedToday: "Completed Today",
+    startTask: "Start Task",
+    viewReports: "View Reports",
+    history: "History",
+    view: "View",
+    
+    // Manager (Legacy keys kept for safety)
     goodMorning: "Good Morning",
     dailyProgress: "Daily Progress",
     done: "Done",
@@ -64,11 +93,14 @@ const TRANSLATIONS = {
     
     // Task Card
     dueNow: "Due Now",
+    overdue: "Overdue",
     upcoming: "Upcoming",
     completed: "Completed",
-    logTemp: "LOG TEMP",
-    startTest: "START TEST",
-    last: "Last",
+    logTemp: "Log Temp",
+    startTest: "Start Test",
+    calibrate: "Calibrate",
+    last: "Last reading",
+    recorded: "Recorded",
     req: "Req",
     
     // Logging Screen
@@ -93,6 +125,19 @@ const TRANSLATIONS = {
     recordAction: "RECORD ACTION",
     describeAction: "Describe Action Taken",
     typeDetails: "Type details here...",
+    
+    // Warming Cabinet
+    cabinetNotReady: "CABINET NOT READY",
+    cabinetNotReadyMsg: "Do not place food until 140°F is reached.",
+    readyForUse: "READY FOR USE",
+    warmingCriticalLimit: "Critical Limit: 140°F",
+    logIssue: "LOG ISSUE",
+
+    // Calibration
+    calMethod: "Calibration Method",
+    icePoint: "Ice Point (32°F)",
+    boilPoint: "Boiling Point (212°F)",
+    thermometer: "Thermometer",
     
     // Supervisor
     commandCenter: "District Command Center",
@@ -156,6 +201,18 @@ const TRANSLATIONS = {
     recentReports: "Recent Reports",
     download: "Download",
 
+    // Sync
+    syncDetails: "Sync Status",
+    itemsPending: "items pending upload",
+    itemsFailed: "items failed",
+    retryAll: "RETRY ALL",
+    retry: "Retry",
+    simulateOffline: "Simulate Offline Mode",
+    simulateOnline: "Go Online",
+    uploading: "Uploading",
+    errorTimeout: "Network Timeout",
+    errorServer: "Server Error (500)",
+
     // Corrective Actions (Values)
     "Placed on hold - evaluating safety": "Placed on hold - evaluating safety",
     "Moved to working cooler": "Moved to working cooler",
@@ -165,6 +222,33 @@ const TRANSLATIONS = {
     "Discarded & remixed solution": "Discarded & remixed solution",
     "Adjusted dispenser settings": "Adjusted dispenser settings",
     "Called maintenance": "Called maintenance",
+    "Adjusted and re-tested": "Adjusted and re-tested",
+    "Discarded - replaced with new unit": "Discarded - replaced with new unit",
+    "Sent for repair": "Sent for repair",
+    "Continue heating - Recheck later": "Continue heating - Recheck later",
+
+    // Data Values (Locations & Units)
+    "Kitchen Main": "Kitchen Main",
+    "Dish Room": "Dish Room",
+    "Kitchen": "Kitchen",
+    "Cafeteria Line A": "Cafeteria Line A",
+    "Cafeteria Main": "Cafeteria Main",
+    "Kitchen Office": "Kitchen Office",
+    "Serving Line": "Serving Line",
+    "Pizza Station": "Pizza Station",
+    "Cabinet A": "Cabinet A",
+    "Cabinet B": "Cabinet B",
+    "Pizza Warmer 1": "Pizza Warmer 1",
+    "Pizza Warmer 2": "Pizza Warmer 2",
+    "Walk-in Cooler": "Walk-in Cooler",
+    "Reach-in Cooler": "Reach-in Cooler",
+    "Milk Cooler": "Milk Cooler",
+    "Line Cooler 1": "Line Cooler 1",
+    "Line Cooler 2": "Line Cooler 2",
+    "Salad Bar": "Salad Bar",
+    "Thermometer #1": "Thermometer #1",
+    "Thermometer #2": "Thermometer #2",
+    "Thermometer #3": "Thermometer #3"
   },
   es: {
     // Login
@@ -178,9 +262,26 @@ const TRANSLATIONS = {
     
     // Common
     logout: "Salir",
-    online: "EN LÍNEA",
+    online: "En línea",
+    offline: "Sin conexión",
+    syncing: "Sincronizando...",
+    syncError: "Error Sinc",
+    pendingLogs: "Registros Pendientes",
     
-    // Manager
+    // Manager Dashboard New
+    todaysProgress: "Progreso de Hoy",
+    moreAttention: "⚠️ Se requiere atención",
+    makingProgress: "👍 Progresando",
+    almostDone: "🎉 ¡Casi listo!",
+    upNext: "Siguiente Tarea",
+    comingUp: "Próximas Tareas",
+    completedToday: "Completado Hoy",
+    startTask: "Iniciar Tarea",
+    viewReports: "Ver Informes",
+    history: "Historial",
+    view: "Ver",
+    
+    // Manager (Legacy)
     goodMorning: "Buenos Días",
     dailyProgress: "Progreso Diario",
     done: "Listo",
@@ -189,11 +290,14 @@ const TRANSLATIONS = {
     
     // Task Card
     dueNow: "Vence Ahora",
+    overdue: "Atrasado",
     upcoming: "Próximo",
     completed: "Completado",
-    logTemp: "REGISTRAR TEMP",
-    startTest: "INICIAR PRUEBA",
-    last: "Último",
+    logTemp: "Reg Temp",
+    startTest: "Iniciar",
+    calibrate: "Calibrar",
+    last: "Última lectura",
+    recorded: "Grabado",
     req: "Req",
     
     // Logging Screen
@@ -218,6 +322,19 @@ const TRANSLATIONS = {
     recordAction: "REGISTRAR ACCIÓN",
     describeAction: "Describir Acción Tomada",
     typeDetails: "Escriba detalles aquí...",
+
+    // Warming Cabinet
+    cabinetNotReady: "GABINETE NO LISTO",
+    cabinetNotReadyMsg: "No coloque comida hasta que alcance 140°F.",
+    readyForUse: "LISTO PARA USAR",
+    warmingCriticalLimit: "Límite Crítico: 140°F",
+    logIssue: "REGISTRAR PROBLEMA",
+
+    // Calibration
+    calMethod: "Método de Calibración",
+    icePoint: "Punto de Hielo (32°F)",
+    boilPoint: "Punto de Ebullición (212°F)",
+    thermometer: "Termómetro",
     
     // Supervisor
     commandCenter: "Centro de Comando Distrital",
@@ -270,7 +387,7 @@ const TRANSLATIONS = {
     reportReady: "Informe Generado con Éxito",
     today: "Hoy",
     thisWeek: "Esta Semana",
-    thisMonth: "Este Mes",
+    thisMonth: "Esta Mes",
     custom: "Rango Personalizado",
     allSchools: "Todas las Escuelas",
     allLogs: "Todos los Tipos",
@@ -281,6 +398,18 @@ const TRANSLATIONS = {
     recentReports: "Informes Recientes",
     download: "Descargar",
 
+    // Sync
+    syncDetails: "Estado de Sincronización",
+    itemsPending: "elementos pendientes",
+    itemsFailed: "elementos fallidos",
+    retryAll: "REINTENTAR TODOS",
+    retry: "Reintentar",
+    simulateOffline: "Simular Modo Offline",
+    simulateOnline: "Ir Online",
+    uploading: "Subiendo",
+    errorTimeout: "Tiempo de espera agotado",
+    errorServer: "Error del servidor (500)",
+
     // Corrective Actions (Values)
     "Placed on hold - evaluating safety": "Retenido - evaluando seguridad",
     "Moved to working cooler": "Trasladado a refrigerador operativo",
@@ -290,6 +419,33 @@ const TRANSLATIONS = {
     "Discarded & remixed solution": "Solución desechada y preparada nuevamente",
     "Adjusted dispenser settings": "Configuración del dispensador ajustada",
     "Called maintenance": "Se llamó a mantenimiento",
+    "Adjusted and re-tested": "Ajustado y probado nuevamente",
+    "Discarded - replaced with new unit": "Desechado - reemplazado con nueva unidad",
+    "Sent for repair": "Enviado a reparación",
+    "Continue heating - Recheck later": "Continuar calentando - Revisar más tarde",
+
+    // Data Values (Locations & Units)
+    "Kitchen Main": "Cocina Principal",
+    "Dish Room": "Cuarto de Lavado",
+    "Kitchen": "Cocina",
+    "Cafeteria Line A": "Cafetería Línea A",
+    "Cafeteria Main": "Cafetería Principal",
+    "Kitchen Office": "Oficina de Cocina",
+    "Serving Line": "Línea de Servicio",
+    "Pizza Station": "Estación de Pizza",
+    "Cabinet A": "Gabinete A",
+    "Cabinet B": "Gabinete B",
+    "Pizza Warmer 1": "Calentador Pizza 1",
+    "Pizza Warmer 2": "Calentador Pizza 2",
+    "Walk-in Cooler": "Refrigerador Principal",
+    "Reach-in Cooler": "Refrigerador de Alcance",
+    "Milk Cooler": "Enfriador de Leche",
+    "Line Cooler 1": "Enfriador Línea 1",
+    "Line Cooler 2": "Enfriador Línea 2",
+    "Salad Bar": "Barra de Ensaladas",
+    "Thermometer #1": "Termómetro #1",
+    "Thermometer #2": "Termómetro #2",
+    "Thermometer #3": "Termómetro #3"
   }
 };
 
@@ -299,7 +455,8 @@ const TASK_TITLES: Record<string, { en: string, es: string }> = {
     "Refrigerator Temperature Log": { en: "Refrigerator Temperature Log", es: "Registro Temp. Refrigerador" },
     "Milk Cooler Temp": { en: "Milk Cooler Temp", es: "Temp. Enfriador de Leche" },
     "Serving Line Checks": { en: "Serving Line Checks", es: "Revisiones Línea de Servicio" },
-    "Warming Cabinet": { en: "Warming Cabinet", es: "Gabinete de Calentamiento" }
+    "Warming Cabinet Temperature Log": { en: "Warming Cabinet Temperature Log", es: "Registro Temp. Gabinete Térmico" },
+    "Thermometer Calibration Log": { en: "Thermometer Calibration Log", es: "Calibración de Termómetros" }
 };
 
 // --- MOCK DATA ---
@@ -316,9 +473,26 @@ const INITIAL_TASKS = [
     title: "Morning Cooler Check",
     type: "temp",
     status: "completed",
-    time: "7:15am",
+    time: "Due: 7:15am",
     location: "Kitchen Main",
-    value: "38°F"
+    value: "38°F",
+    lastLog: { time: "Yesterday", value: "37°F" }
+  },
+  {
+    id: 4,
+    title: "Refrigerator Temperature Log",
+    type: "temp",
+    status: "due",
+    time: "Overdue (15m)", // Made urgent to feature in Hero Card
+    location: "Kitchen",
+    range: { min: 33, max: 41, unit: "°F" },
+    lastLog: { time: "Yesterday, 3:30pm", value: "39°F" },
+    units: ["Walk-in Cooler", "Reach-in Cooler", "Milk Cooler"],
+    lastLogs: {
+        "Walk-in Cooler": { value: "39°F", time: "Yesterday, 3:30pm" },
+        "Reach-in Cooler": { value: "36°F", time: "Yesterday, 3:35pm" },
+        "Milk Cooler": { value: "38°F", time: "Yesterday, 3:40pm" }
+    }
   },
   {
     id: 2,
@@ -328,17 +502,53 @@ const INITIAL_TASKS = [
     time: "Due Now",
     location: "Dish Room",
     range: { min: 272, max: 700, unit: "ppm" },
-    lastLog: { time: "8:00am", value: "350 ppm" }
+    lastLog: { time: "Yesterday 2:15 PM", value: "350 ppm" }
   },
   {
-    id: 4,
-    title: "Refrigerator Temperature Log",
-    type: "temp",
+    id: 7,
+    title: "Thermometer Calibration Log",
+    type: "calibration",
+    status: "due",
+    time: "Due in 45 min",
+    location: "Kitchen Office",
+    range: { min: 30, max: 34, unit: "°F" },
+    lastLog: { time: "Last Month", value: "Pass" },
+    units: ["Thermometer #1", "Thermometer #2", "Thermometer #3"],
+    lastLogs: {
+        "Thermometer #1": { value: "Pass", time: "Oct 15 (Ice)" },
+        "Thermometer #2": { value: "Pass", time: "Sep 01 (Boil)" },
+        "Thermometer #3": { value: "Fail", time: "Yesterday (Ice)" }
+    }
+  },
+  {
+    id: 3,
+    title: "Warming Cabinet Temperature Log",
+    type: "warming",
     status: "due",
     time: "Due Now",
-    location: "Walk-in Cooler",
-    range: { min: 33, max: 41, unit: "°F" },
-    lastLog: { time: "Yesterday, 3:30pm", value: "39°F" }
+    location: "Serving Line",
+    range: { min: 140, max: 200, unit: "°F" },
+    units: ["Cabinet A", "Cabinet B"],
+    lastLog: { time: "Yesterday, 6:45 AM", value: "155°F" },
+    lastLogs: {
+        "Cabinet A": { value: "155°F", time: "Yesterday" },
+        "Cabinet B": { value: "148°F", time: "Yesterday" }
+    }
+  },
+  {
+    id: 8,
+    title: "Warming Cabinet Temperature Log",
+    type: "warming",
+    status: "due",
+    time: "Due Now",
+    location: "Pizza Station",
+    range: { min: 140, max: 200, unit: "°F" },
+    units: ["Pizza Warmer 1", "Pizza Warmer 2"],
+    lastLog: { time: "Yesterday", value: "142°F" },
+    lastLogs: {
+        "Pizza Warmer 1": { value: "142°F", time: "Yesterday" },
+        "Pizza Warmer 2": { value: "145°F", time: "Yesterday" }
+    }
   },
   {
     id: 5,
@@ -354,21 +564,17 @@ const INITIAL_TASKS = [
     id: 6,
     title: "Serving Line Checks",
     type: "temp",
-    status: "due",
-    time: "Due Now",
+    status: "upcoming",
+    time: "Due: 11:30am",
     location: "Cafeteria Main",
     range: { min: 33, max: 41, unit: "°F" },
     lastLog: { time: "Yesterday, 11:00am", value: "All OK" },
-    units: ["Line Cooler 1", "Line Cooler 2", "Salad Bar"]
-  },
-  {
-    id: 3,
-    title: "Warming Cabinet",
-    type: "temp",
-    status: "upcoming",
-    time: "Due: 11:00am",
-    location: "Serving Line",
-    dueTime: "11:00 AM"
+    units: ["Line Cooler 1", "Line Cooler 2", "Salad Bar"],
+    lastLogs: {
+        "Line Cooler 1": { value: "38°F", time: "Yesterday" },
+        "Line Cooler 2": { value: "40°F", time: "Yesterday" },
+        "Salad Bar": { value: "36°F", time: "Yesterday" }
+    }
   }
 ];
 
@@ -417,10 +623,6 @@ const MOCK_RECENT_REPORTS = [
 
 // --- BUSINESS LOGIC HELPERS ---
 
-// FR-202: Color coding logic
-// Green: >=90% compliance, no overdue logs
-// Yellow: 75-89% compliance OR 1-2 overdue logs
-// Red: <75% compliance OR 3+ overdue logs
 const getSchoolStatus = (school: any) => {
   if (school.compliance < 75 || school.missingLogs >= 3) return 'critical';
   if (school.compliance < 90 || school.missingLogs > 0) return 'warning';
@@ -429,103 +631,133 @@ const getSchoolStatus = (school: any) => {
 
 // --- UTILITY COMPONENTS ---
 
+const getStatusBadgeStyles = (status: string, timeText: string) => {
+  if (timeText.includes('Now') || status === 'due') return { bg: 'bg-orange-100', text: 'text-orange-700', icon: <AlertTriangle size={12} strokeWidth={3} /> };
+  if (timeText.toLowerCase().includes('overdue')) return { bg: 'bg-red-100', text: 'text-red-700', icon: <AlertTriangle size={12} strokeWidth={3} /> };
+  if (status === 'completed') return { bg: 'bg-green-100', text: 'text-green-700', icon: <Check size={12} strokeWidth={3} /> };
+  return { bg: 'bg-yellow-100', text: 'text-yellow-700', icon: <Clock size={12} strokeWidth={3} /> };
+};
+
 const StatusBadge = ({ status, text, lang }: { status: string, text: string, lang: 'en' | 'es' }) => {
-  const styles: Record<string, string> = {
-    completed: "bg-green-100 text-green-800 border-green-200",
-    good: "bg-green-100 text-green-800 border-green-200",
-    due: "bg-yellow-100 text-yellow-800 border-yellow-200 animate-pulse-slow",
-    warning: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    upcoming: "bg-gray-100 text-gray-600 border-gray-200",
-    critical: "bg-red-100 text-red-800 border-red-200 font-bold",
-  };
+  const styles = getStatusBadgeStyles(status, text);
   
-  const baseClass = "px-2.5 py-0.5 rounded-full text-xs font-medium border flex items-center gap-1 w-fit";
-  
-  // Translate status text if it matches known keys
   let displayText = text;
   if (text === "Due Now") displayText = TRANSLATIONS[lang].dueNow;
   if (text.includes("Due:")) displayText = text.replace("Due:", TRANSLATIONS[lang].upcoming + ":");
+  if (status === 'completed') displayText = TRANSLATIONS[lang].completed;
 
   return (
-    <span className={`${baseClass} ${styles[status] || styles.upcoming}`}>
-      {status === 'completed' && <Check size={12} strokeWidth={3} />}
-      {status === 'due' && <Clock size={12} />}
-      {(status === 'warning' || status === 'critical') && <AlertTriangle size={12} />}
-      {displayText}
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold gap-1.5 ${styles.bg} ${styles.text}`}>
+      {styles.icon} {displayText}
     </span>
   );
 };
 
 // --- SUB-COMPONENTS ---
 
-const TaskCard: React.FC<{ task: any, onClick: () => void, lang: 'en' | 'es' }> = ({ task, onClick, lang }) => {
-  const isDue = task.status === 'due';
-  const isCompleted = task.status === 'completed';
-  const isUrgent = task.time.includes('Now');
+const HeroTaskCard = ({ task, onClick, lang }: { task: any, onClick: () => void, lang: 'en' | 'es' }) => {
   const t = TRANSLATIONS[lang];
-  
-  // Dynamic button label based on task type
-  const actionLabel = task.type === 'temp' ? t.logTemp : t.startTest;
-
-  // Translate Title
   const title = TASK_TITLES[task.title]?.[lang] || task.title;
+  // Translate Location (if available in dict, else use raw)
+  const location = (t as any)[task.location] || task.location;
+  
+  // Determine urgency styles based on time text
+  let borderClass = 'border-yellow-500';
+  let btnGradient = 'bg-gradient-to-r from-blue-600 to-blue-700';
+  
+  if (task.time.toLowerCase().includes('overdue')) {
+    borderClass = 'border-red-500';
+    btnGradient = 'bg-gradient-to-r from-red-600 to-red-700';
+  } else if (task.time.includes('Now')) {
+    borderClass = 'border-orange-500';
+    btnGradient = 'bg-gradient-to-r from-orange-600 to-orange-700';
+  }
+
+  let actionLabel = task.type === 'temp' || task.type === 'warming' ? t.logTemp : t.startTest;
+  if (task.type === 'calibration') actionLabel = t.calibrate;
 
   return (
-    <div 
-      onClick={isDue ? onClick : undefined}
-      className={`relative p-4 rounded-2xl mb-3 transition-all duration-200 ${
-        isDue 
-          ? 'bg-white shadow-lg border-l-4 border-yellow-400 translate-y-0' 
-          : 'bg-slate-50 border border-slate-100 opacity-90'
-      } ${isCompleted ? 'opacity-60' : ''}`}
-    >
-      <div className="flex justify-between items-start mb-2">
-        <div>
-          <h3 className={`font-bold text-lg ${isDue ? 'text-slate-900' : 'text-slate-600'}`}>
-            {title}
-          </h3>
-          <p className="text-sm text-slate-500 flex items-center gap-1">
-            <MapPin size={12} /> {task.location}
-          </p>
-        </div>
-        <StatusBadge status={task.status} text={task.time} lang={lang} />
-      </div>
-
-      <div className="flex items-center justify-between mt-3">
-        {isCompleted ? (
-          <div className="flex items-center gap-2 text-green-700 font-semibold bg-green-50 px-3 py-1.5 rounded-lg w-full">
-            <Check size={18} />
-            {t.completed}: {task.value}
-          </div>
-        ) : isDue ? (
-          <div className="w-full flex items-center gap-3">
-             {/* Display Last Log and Requirements inline for context */}
-             <div className="flex-1">
-              <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
-                {task.lastLog && (
-                  <span className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600 font-medium">
-                    {t.last}: {task.lastLog.value}
-                  </span>
-                )}
-                {task.range && (
-                   <span className="text-slate-400">
-                    {t.req}: {task.range.min}-{task.range.max}{task.range.unit}
-                   </span>
-                )}
-              </div>
+    <div className={`rounded-2xl shadow-xl overflow-hidden border-2 bg-white ${borderClass} mb-6`}>
+      <div className="p-5">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex-1">
+            <div className="flex items-center mb-2">
+              <StatusBadge status={task.status} text={task.time} lang={lang} />
             </div>
-            <button className={`bg-slate-900 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md active:scale-95 transition-transform flex items-center gap-2 ${isUrgent ? 'animate-pulse-slow' : ''}`}>
-              {actionLabel} <ChevronRight size={16} />
-            </button>
+            <h3 className="text-xl font-bold text-slate-900 mb-1 leading-tight">
+              {title}
+            </h3>
+            <p className="text-sm text-slate-600 font-medium flex items-center gap-1">
+              <MapPin size={14} /> {location}
+            </p>
           </div>
-        ) : (
-          <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-             <div className="w-0 h-full bg-slate-400" />
+        </div>
+        
+        <div className="bg-slate-50 rounded-lg p-3 mb-4 border border-slate-100">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-slate-500 font-bold uppercase">{t.last}</span>
+            <span className="font-bold text-slate-700">{task.lastLog?.value || '--'}</span>
           </div>
-        )}
+          <div className="flex items-center justify-between text-xs mt-1">
+            <span className="text-slate-500 font-bold uppercase">{t.recorded}</span>
+            <span className="font-medium text-slate-600">{task.lastLog?.time || '--'}</span>
+          </div>
+        </div>
+
+        <button 
+          onClick={onClick}
+          className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-lg active:scale-[0.98] transition-all flex items-center justify-center ${btnGradient}`}
+        >
+          {actionLabel}
+          <ChevronRight className="ml-2" size={24} />
+        </button>
       </div>
     </div>
   );
+};
+
+const CompactTaskCard = ({ task, onClick, lang }: { task: any, onClick: () => void, lang: 'en' | 'es' }) => {
+  const t = TRANSLATIONS[lang];
+  const title = TASK_TITLES[task.title]?.[lang] || task.title;
+  // Translate Location
+  const location = (t as any)[task.location] || task.location;
+
+  return (
+    <div className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow border border-slate-100">
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <div className="flex items-center mb-1">
+             <StatusBadge status={task.status} text={task.time} lang={lang} />
+          </div>
+          <h3 className="font-bold text-slate-900 text-sm">{title}</h3>
+          <p className="text-xs text-slate-500 mt-0.5">{location}</p>
+        </div>
+        <button 
+          onClick={onClick}
+          className="ml-3 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg font-bold text-sm text-slate-700 transition-colors"
+        >
+          {t.startTask.split(' ')[0]}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const CompletedTaskCard = ({ task, lang }: { task: any, lang: 'en' | 'es' }) => {
+    const title = TASK_TITLES[task.title]?.[lang] || task.title;
+    return (
+        <div className="bg-white rounded-xl shadow-sm p-4 border border-slate-100 opacity-75">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center flex-1">
+                <CheckCircle className="text-green-500 mr-3" size={20} strokeWidth={3} />
+                <div>
+                    <h3 className="font-bold text-slate-700 text-sm">{title}</h3>
+                    <p className="text-xs text-slate-500 font-medium">{task.value} • {task.lastLog?.time || 'Today'}</p>
+                </div>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 const LoggingScreen = ({ task, onClose, onComplete, lang }: { task: any, onClose: () => void, onComplete: (id: number, val: string) => void, lang: 'en' | 'es' }) => {
@@ -536,34 +768,66 @@ const LoggingScreen = ({ task, onClose, onComplete, lang }: { task: any, onClose
   const [correctiveAction, setCorrectiveAction] = useState('');
   const [customNote, setCustomNote] = useState('');
   
-  // Multi-unit logic
   const [selectedUnit, setSelectedUnit] = useState(task.units?.[0] || '');
   const [unitValues, setUnitValues] = useState<Record<string, string>>({});
+  
+  // Calibration specific state
+  const [calMethod, setCalMethod] = useState<'ice' | 'boil'>('ice');
 
-  // Dynamic Corrective Actions based on Task Type
-  const correctiveActionsRaw = task.type === 'temp' 
-    ? [
-        "Placed on hold - evaluating safety",
-        "Moved to working cooler",
-        "Discarded",
-        "Verified safe per protocol",
-        "Other (add note)"
-      ]
-    : [
+  let correctiveActionsRaw: string[] = [];
+  if (task.type === 'calibration') {
+    correctiveActionsRaw = [
+      "Adjusted and re-tested",
+      "Discarded - replaced with new unit",
+      "Sent for repair",
+      "Other (add note)"
+    ];
+  } else if (task.type === 'warming') {
+    correctiveActionsRaw = [
+      "Continue heating - Recheck later",
+      "Called maintenance",
+      "Other (add note)"
+    ];
+  } else if (task.type === 'temp') {
+    correctiveActionsRaw = [
+      "Placed on hold - evaluating safety",
+      "Moved to working cooler",
+      "Discarded",
+      "Verified safe per protocol",
+      "Other (add note)"
+    ];
+  } else {
+    correctiveActionsRaw = [
         "Discarded & remixed solution",
         "Adjusted dispenser settings",
         "Called maintenance",
         "Other (add note)"
       ];
+  }
 
   const handleMagicFill = () => {
-    // Simulates AI prediction based on history
-    setManualValue(task.type === 'temp' ? '38' : '350');
+    // If unit-specific history is available, use it for "prediction"
+    if (task.units && selectedUnit && task.lastLogs && task.lastLogs[selectedUnit]) {
+        const lastValStr = task.lastLogs[selectedUnit].value;
+        const num = lastValStr.replace(/[^0-9.-]/g, '');
+        if (num) {
+            setManualValue(num);
+            setAnimationState('idle');
+            return;
+        }
+    }
+    // Fallback based on type
+    if (task.type === 'calibration') {
+        setManualValue(calMethod === 'ice' ? '32' : '212');
+    } else if (task.type === 'warming') {
+        setManualValue('145');
+    } else {
+        setManualValue(task.type === 'temp' ? '38' : '350');
+    }
+    setAnimationState('idle');
   };
 
   const handleUnitSelect = (unit: string) => {
-    // If we have a value for this unit in history, load it? 
-    // For now, simpler to just allow jumping between units if needed, but primarily we want sequential.
     setSelectedUnit(unit);
     setManualValue(unitValues[unit] || '');
     setStep('input');
@@ -584,8 +848,15 @@ const LoggingScreen = ({ task, onClose, onComplete, lang }: { task: any, onClose
 
   const handleLogSubmit = () => {
     const val = manualValue;
-    const min = task.range?.min || 0;
-    const max = task.range?.max || 1000;
+    // Determine range dynamically
+    let min = task.range?.min || 0;
+    let max = task.range?.max || 1000;
+    
+    if (task.type === 'calibration') {
+        if (calMethod === 'ice') { min = 30; max = 34; }
+        else { min = 210; max = 214; }
+    }
+
     const valueNum = parseFloat(val);
 
     if (!val) return;
@@ -593,30 +864,24 @@ const LoggingScreen = ({ task, onClose, onComplete, lang }: { task: any, onClose
     if (valueNum >= min && valueNum <= max) {
       setAnimationState('success');
       
-      // Save the value for the current unit
       const newUnitValues = { ...unitValues, [selectedUnit]: val };
       setUnitValues(newUnitValues);
 
       setTimeout(() => {
-        // Multi-unit: Check if there's a next unit
         if (task.units) {
           const currentIndex = task.units.indexOf(selectedUnit);
           if (currentIndex < task.units.length - 1) {
-            // Move to next unit
             const nextUnit = task.units[currentIndex + 1];
             setSelectedUnit(nextUnit);
             setManualValue('');
             setAnimationState('idle');
-            // Toast or visual cue could go here
             return;
           } else {
-             // All units done
              onComplete(task.id, `${Object.keys(newUnitValues).length} Units OK`);
              return;
           }
         }
 
-        // Single unit completion
         onComplete(task.id, `${val}${task.range?.unit || ''}`);
       }, 1200);
     } else {
@@ -631,25 +896,32 @@ const LoggingScreen = ({ task, onClose, onComplete, lang }: { task: any, onClose
     onComplete(task.id, `Corrected: ${finalNote}`);
   };
   
-  // Calculate gauge position
-  const min = task.range?.min || 0;
-  const max = task.range?.max || 100;
+  // Determine ranges for UI display
+  let min = task.range?.min || 0;
+  let max = task.range?.max || 100;
+  if (task.type === 'calibration') {
+    if (calMethod === 'ice') { min = 30; max = 34; }
+    else { min = 210; max = 214; }
+  }
+
   const currentVal = parseFloat(manualValue) || min;
-  // Clamp percentage between 0 and 100
   const percentage = Math.min(Math.max(((currentVal - (min * 0.5)) / ((max * 1.5) - (min * 0.5))) * 100, 0), 100);
   
-  // Gauge Status Text
   const isOutOfRange = (parseFloat(manualValue) < min || parseFloat(manualValue) > max) && manualValue !== '';
   const isSafe = !isOutOfRange && manualValue !== '';
+  const isWarming = task.type === 'warming';
 
-  // Get index for copy previous button logic
   const unitIndex = task.units ? task.units.indexOf(selectedUnit) : -1;
   const showCopyButton = unitIndex > 0;
   const previousUnitName = showCopyButton ? task.units[unitIndex - 1] : '';
   const previousUnitValue = showCopyButton ? unitValues[previousUnitName] : '';
   
-  // Translate title
   const title = TASK_TITLES[task.title]?.[lang] || task.title;
+  // Translate Location
+  const location = (t as any)[task.location] || task.location;
+  // Translate Unit
+  const unitName = (t as any)[selectedUnit] || selectedUnit;
+  const specificLastLog = task.lastLogs?.[selectedUnit] || task.lastLog;
 
   if (animationState === 'success') {
     return (
@@ -660,7 +932,7 @@ const LoggingScreen = ({ task, onClose, onComplete, lang }: { task: any, onClose
         <h2 className="text-4xl font-bold mb-2">{t.success}</h2>
         <p className="text-green-100 text-xl">
             {task.units && unitIndex < task.units.length - 1 
-                ? `${t.saved} ${selectedUnit}` 
+                ? `${t.saved} ${unitName}` 
                 : t.logVerified}
         </p>
         {task.units && unitIndex < task.units.length - 1 && (
@@ -672,24 +944,21 @@ const LoggingScreen = ({ task, onClose, onComplete, lang }: { task: any, onClose
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-50 flex flex-col h-full animate-in slide-in-from-bottom duration-300">
-      {/* Header */}
       <div className="bg-white px-6 py-4 shadow-sm flex items-center justify-between shrink-0">
         <button onClick={onClose} className="p-2 -ml-2 text-slate-400 hover:text-slate-600">
           <X size={24} />
         </button>
         <div className="text-center">
           <h2 className="font-bold text-slate-800">{title}</h2>
-          <p className="text-xs text-slate-500">{task.location}</p>
+          <p className="text-xs text-slate-500">{location}</p>
         </div>
         <div className="w-8" />
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
         
         {step === 'input' ? (
           <>
-            {/* Context Card (Simplified) */}
             <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t.requiredRange}</span>
@@ -697,36 +966,67 @@ const LoggingScreen = ({ task, onClose, onComplete, lang }: { task: any, onClose
               </div>
               <div className="flex justify-between items-end">
                 <div className="text-2xl font-bold text-slate-800">
-                  {task.range.min} - {task.range.max} <span className="text-base font-normal text-slate-400">{task.range.unit}</span>
+                  {min} - {max} <span className="text-base font-normal text-slate-400">{task.range.unit}</span>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-semibold text-slate-600">{task.lastLog?.value || '--'}</div>
-                  <div className="text-xs text-slate-400">{task.lastLog?.time || 'Never'}</div>
+                  <div className="text-lg font-semibold text-slate-600">{specificLastLog?.value || '--'}</div>
+                  <div className="text-xs text-slate-400">{specificLastLog?.time || 'Never'}</div>
                 </div>
               </div>
             </div>
 
-            {/* Simulated Action Button */}
-            <button 
-                onClick={() => handleMagicFill()} // For demo, Scan button also fills
-                className="bg-slate-900 text-white rounded-2xl py-8 flex flex-col items-center justify-center gap-3 shadow-lg active:scale-95 transition-all"
-            >
-              <ScanLine size={48} className="opacity-80" />
-              <span className="font-bold tracking-widest text-sm opacity-90">
-                {task.type === 'temp' ? t.readThermometer : t.scanTestStrip}
-              </span>
-            </button>
+            {task.type === 'calibration' ? (
+               <div className="flex gap-4 mb-2">
+                 <button 
+                    onClick={() => setCalMethod('ice')}
+                    className={`flex-1 py-4 rounded-2xl flex flex-col items-center gap-2 border-2 transition-all ${
+                        calMethod === 'ice' 
+                        ? 'bg-blue-50 border-blue-500 text-blue-700 shadow-md' 
+                        : 'bg-white border-slate-200 text-slate-400'
+                    }`}
+                 >
+                    <Snowflake size={24} />
+                    <span className="text-xs font-bold">{t.icePoint}</span>
+                 </button>
+                 <button 
+                    onClick={() => setCalMethod('boil')}
+                    className={`flex-1 py-4 rounded-2xl flex flex-col items-center gap-2 border-2 transition-all ${
+                        calMethod === 'boil' 
+                        ? 'bg-orange-50 border-orange-500 text-orange-700 shadow-md' 
+                        : 'bg-white border-slate-200 text-slate-400'
+                    }`}
+                 >
+                    <Flame size={24} />
+                    <span className="text-xs font-bold">{t.boilPoint}</span>
+                 </button>
+               </div>
+            ) : task.type === 'warming' ? (
+                 <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100 flex items-center justify-center gap-4 text-orange-800 font-bold">
+                    <Soup size={24} />
+                    <span>{t.warmingCriticalLimit}</span>
+                 </div>
+            ) : (
+                <button 
+                    onClick={() => handleMagicFill()}
+                    className="bg-slate-900 text-white rounded-2xl py-8 flex flex-col items-center justify-center gap-3 shadow-lg active:scale-95 transition-all"
+                >
+                <ScanLine size={48} className="opacity-80" />
+                <span className="font-bold tracking-widest text-sm opacity-90">
+                    {task.type === 'temp' ? t.readThermometer : t.scanTestStrip}
+                </span>
+                </button>
+            )}
 
-            {/* Manual Entry Section */}
             <div className="mt-auto">
                
-               {/* Multi-Unit Selector */}
                {task.units && (
                  <div className="mb-4">
+                    {task.type === 'calibration' && <div className="text-xs font-bold text-slate-400 mb-2 uppercase">{t.thermometer}</div>}
                     <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
                         {task.units.map((unit: string, idx: number) => {
                             const isDone = unitValues[unit];
                             const isCurrent = unit === selectedUnit;
+                            const translatedUnit = (t as any)[unit] || unit;
                             return (
                                 <button
                                     key={unit}
@@ -740,7 +1040,7 @@ const LoggingScreen = ({ task, onClose, onComplete, lang }: { task: any, onClose
                                     }`}
                                 >
                                     {isDone && <Check size={14} />}
-                                    {unit}
+                                    {translatedUnit}
                                 </button>
                             );
                         })}
@@ -751,7 +1051,6 @@ const LoggingScreen = ({ task, onClose, onComplete, lang }: { task: any, onClose
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-bold text-slate-500 uppercase">{t.manualEntry}</label>
                 
-                {/* Copy Previous Button */}
                 {showCopyButton && previousUnitValue && (
                   <button 
                     onClick={copyPreviousValue}
@@ -782,7 +1081,7 @@ const LoggingScreen = ({ task, onClose, onComplete, lang }: { task: any, onClose
                   }}
                   placeholder="000"
                   className={`w-full text-5xl font-bold text-center py-6 rounded-2xl border-2 outline-none transition-all ${
-                    animationState === 'error' 
+                    animationState === 'error' || (isWarming && !isSafe)
                       ? 'border-red-300 bg-red-50 text-red-800 placeholder-red-200' 
                       : isSafe 
                         ? 'border-green-300 bg-green-50 text-green-900'
@@ -793,37 +1092,42 @@ const LoggingScreen = ({ task, onClose, onComplete, lang }: { task: any, onClose
                   {task.range.unit}
                 </span>
                 
-                {/* Visual Gauge Integrated Here */}
                 <div className="mt-4 px-2">
-                   <div className="relative h-3 bg-slate-200 rounded-full w-full overflow-hidden">
-                      {/* Safe Zone Marker (approximate) */}
-                      <div 
-                        className="absolute top-0 bottom-0 bg-green-400 opacity-30" 
-                        style={{
-                            left: `${((min - (min*0.5)) / ((max*1.5) - (min*0.5))) * 100}%`,
-                            width: `${((max - min) / ((max*1.5) - (min*0.5))) * 100}%`
-                        }} 
-                      />
-                      
-                      {/* Current Value Indicator */}
-                      {manualValue && (
-                        <div 
-                            className={`absolute top-0 bottom-0 w-1.5 transition-all duration-300 ${isSafe ? 'bg-green-600' : 'bg-red-500'}`}
-                            style={{ left: `${percentage}%` }}
-                        />
-                      )}
-                   </div>
-                   <div className="flex justify-between text-[10px] text-slate-400 mt-1 font-medium font-mono">
-                      <span>{Math.floor(min * 0.5)}</span>
-                      <span className="text-green-600">{min} (MIN)</span>
-                      <span className="text-green-600">{max} (MAX)</span>
-                      <span>{Math.floor(max * 1.5)}</span>
-                   </div>
-                   
-                   {/* Feedback Text */}
-                   <div className={`text-center mt-2 text-xs font-bold tracking-widest ${isSafe ? 'text-green-600' : isOutOfRange ? 'text-red-500' : 'text-slate-300'}`}>
-                      {isSafe ? t.withinRange : isOutOfRange ? t.outOfRange : t.enterValue}
-                   </div>
+                   {isWarming && !isSafe ? (
+                     <div className="text-center animate-in fade-in slide-in-from-top-2">
+                       <div className="text-red-600 font-black text-sm tracking-widest uppercase mb-1">{t.cabinetNotReady}</div>
+                       <div className="text-xs text-red-400 font-medium">{t.cabinetNotReadyMsg}</div>
+                     </div>
+                   ) : (
+                     <>
+                        <div className="relative h-3 bg-slate-200 rounded-full w-full overflow-hidden">
+                            <div 
+                              className="absolute top-0 bottom-0 bg-green-400 opacity-30" 
+                              style={{
+                                  left: `${((min - (min*0.5)) / ((max*1.5) - (min*0.5))) * 100}%`,
+                                  width: `${((max - min) / ((max*1.5) - (min*0.5))) * 100}%`
+                              }} 
+                            />
+                            
+                            {manualValue && (
+                              <div 
+                                  className={`absolute top-0 bottom-0 w-1.5 transition-all duration-300 ${isSafe ? 'bg-green-600' : 'bg-red-500'}`}
+                                  style={{ left: `${percentage}%` }}
+                              />
+                            )}
+                        </div>
+                        <div className="flex justify-between text-[10px] text-slate-400 mt-1 font-medium font-mono">
+                            <span>{Math.floor(min * 0.5)}</span>
+                            <span className="text-green-600">{min} (MIN)</span>
+                            <span className="text-green-600">{max} (MAX)</span>
+                            <span>{Math.floor(max * 1.5)}</span>
+                        </div>
+                        
+                        <div className={`text-center mt-2 text-xs font-bold tracking-widest ${isSafe ? 'text-green-600' : isOutOfRange ? 'text-red-500' : 'text-slate-300'}`}>
+                            {isSafe ? (isWarming ? t.readyForUse : t.withinRange) : isOutOfRange ? t.outOfRange : t.enterValue}
+                        </div>
+                     </>
+                   )}
                 </div>
 
               </div>
@@ -831,28 +1135,32 @@ const LoggingScreen = ({ task, onClose, onComplete, lang }: { task: any, onClose
               <button
                 onClick={handleLogSubmit}
                 disabled={!manualValue}
-                className="w-full bg-slate-900 text-white text-xl font-bold py-5 rounded-2xl shadow-xl disabled:opacity-50 disabled:shadow-none active:scale-[0.98] transition-all"
+                className={`w-full text-xl font-bold py-5 rounded-2xl shadow-xl disabled:opacity-50 disabled:shadow-none active:scale-[0.98] transition-all ${
+                  isWarming && !isSafe 
+                    ? 'bg-red-500 text-white shadow-red-200' 
+                    : 'bg-slate-900 text-white'
+                }`}
               >
-                {t.submit} {task.units && selectedUnit ? `- ${selectedUnit}` : ''}
+                {isWarming && !isSafe ? t.logIssue : t.submit} {task.units && selectedUnit ? `- ${unitName}` : ''}
               </button>
             </div>
           </>
         ) : (
-          /* CORRECTIVE ACTION SCREEN */
           <div className="flex flex-col h-full animate-in slide-in-from-right">
             <div className="bg-red-50 p-6 rounded-3xl border-2 border-red-100 mb-6 text-center">
               <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertTriangle size={32} />
+                {isWarming ? <Soup size={32} /> : <AlertTriangle size={32} />}
               </div>
-              <h3 className="text-red-900 font-bold text-2xl mb-1">{t.outOfRangeTitle}</h3>
-              <p className="text-red-700">{t.outOfRangeMsg} ({task.range.min}-{task.range.max}).</p>
+              <h3 className="text-red-900 font-bold text-2xl mb-1">{isWarming ? t.cabinetNotReady : t.outOfRangeTitle}</h3>
+              <p className="text-red-700">
+                {isWarming ? t.cabinetNotReadyMsg : `${t.outOfRangeMsg} (${min}-${max}).`}
+              </p>
             </div>
 
             <h4 className="font-bold text-slate-700 mb-4 px-2">{t.selectCorrectiveAction}</h4>
             
             <div className="flex flex-col gap-3">
               {correctiveActionsRaw.map((action) => {
-                  // Translate the action
                   const displayAction = (TRANSLATIONS[lang] as any)[action] || action;
                   return (
                     <button
@@ -895,828 +1203,1002 @@ const LoggingScreen = ({ task, onClose, onComplete, lang }: { task: any, onClose
           </div>
         )}
       </div>
-    </div>
-  );
-};
-
-// --- REPORTS VIEW COMPONENT ---
-const ReportsView = ({ lang }: { lang: 'en' | 'es' }) => {
+    );
+  };
+  
+  const ManagerDashboardNew = ({ tasks, onStartTask, lang }: { tasks: any[], onStartTask: (task: any) => void, lang: 'en' | 'es' }) => {
     const t = TRANSLATIONS[lang];
-    const [generating, setGenerating] = useState(false);
-    const [reportReady, setReportReady] = useState(false);
-    const [filters, setFilters] = useState({
-        dateRange: 'today',
-        school: 'all',
-        logType: 'all',
-        status: 'all',
-        format: 'pdf'
+    const [showHistory, setShowHistory] = useState(false);
+    
+    // Logic to find priority task
+    const pendingTasks = tasks.filter(t => t.status !== 'completed');
+    const completedTasks = tasks.filter(t => t.status === 'completed');
+    
+    // Sort pending: Overdue > Due Now > Upcoming
+    pendingTasks.sort((a, b) => {
+        const getScore = (task: any) => {
+            if (task.time.toLowerCase().includes('overdue')) return 3;
+            if (task.time.includes('Now')) return 2;
+            return 1;
+        };
+        return getScore(b) - getScore(a);
     });
-
-    const handleGenerate = () => {
-        setGenerating(true);
-        setReportReady(false);
-        // Simulate API call
-        setTimeout(() => {
-            setGenerating(false);
-            setReportReady(true);
-        }, 2000);
-    };
-
+    
+    const nextTask = pendingTasks.length > 0 ? pendingTasks[0] : null;
+    const otherTasks = pendingTasks.length > 1 ? pendingTasks.slice(1) : [];
+    
+    const completedCount = completedTasks.length;
+    const totalCount = tasks.length;
+    const progress = Math.round((completedCount / totalCount) * 100);
+    
     return (
-        <div className="space-y-6">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-                <div className="flex items-center gap-3 mb-6 pb-6 border-b border-slate-100">
-                    <div className="bg-blue-100 text-blue-600 p-2 rounded-lg">
-                        <Filter size={24} />
-                    </div>
+        <div className="pb-24">
+            {/* Header Card */}
+            <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-b-[2.5rem] shadow-xl p-6 mb-8 text-white relative z-10 mx-[-1px]">
+                <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h2 className="text-xl font-bold text-slate-800">{t.customQueryBuilder}</h2>
-                        <p className="text-sm text-slate-500">Select parameters to generate compliance reports</p>
+                        <h1 className="text-2xl font-bold mb-1">{t.goodMorning}, Maria</h1>
+                        <div className="flex items-center text-slate-300 text-sm">
+                            <MapPin size={14} className="mr-1" />
+                            Jefferson Elementary
+                        </div>
                     </div>
                 </div>
+                
+                <div className="mb-2">
+                     <div className="flex justify-between items-end mb-2">
+                        <span className="text-sm font-bold text-slate-400 uppercase tracking-wide">{t.todaysProgress}</span>
+                        <span className="text-3xl font-bold">{completedCount}/{totalCount}</span>
+                     </div>
+                     <div className="h-3 bg-slate-700/50 rounded-full overflow-hidden backdrop-blur-sm">
+                        <div 
+                            className={`h-full transition-all duration-1000 ease-out rounded-full ${
+                                progress >= 80 ? 'bg-green-500' : progress >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+                            }`}
+                            style={{ width: `${progress}%` }}
+                        />
+                     </div>
+                     <div className="mt-2 text-xs font-medium text-slate-400 flex items-center gap-1.5">
+                        {progress < 50 ? t.moreAttention : progress < 90 ? t.makingProgress : t.almostDone}
+                     </div>
+                </div>
+            </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    {/* Date Range */}
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase mb-2">{t.dateRange}</label>
-                        <select 
-                            value={filters.dateRange}
-                            onChange={(e) => setFilters({...filters, dateRange: e.target.value})}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-purple-500 transition-colors"
-                        >
-                            <option value="today">{t.today}</option>
-                            <option value="week">{t.thisWeek}</option>
-                            <option value="month">{t.thisMonth}</option>
-                            <option value="custom">{t.custom}</option>
-                        </select>
+            <div className="px-4">
+                {/* Hero Task */}
+                {nextTask && (
+                    <div className="animate-in slide-in-from-bottom-4 duration-500 delay-100">
+                        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 ml-1">{t.upNext}</h2>
+                        <HeroTaskCard task={nextTask} onClick={() => onStartTask(nextTask)} lang={lang} />
                     </div>
+                )}
 
-                    {/* Schools */}
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase mb-2">{t.schools}</label>
-                        <select 
-                            value={filters.school}
-                            onChange={(e) => setFilters({...filters, school: e.target.value})}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-purple-500 transition-colors"
-                        >
-                            <option value="all">{t.allSchools}</option>
-                            {DISTRICT_SCHOOLS.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                        </select>
-                    </div>
-
-                    {/* Log Type */}
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase mb-2">{t.logType}</label>
-                        <select 
-                            value={filters.logType}
-                            onChange={(e) => setFilters({...filters, logType: e.target.value})}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-purple-500 transition-colors"
-                        >
-                            <option value="all">{t.allLogs}</option>
-                            <option value="temp">Temperature</option>
-                            <option value="sanitizer">Sanitizer</option>
-                            <option value="calibration">Calibration</option>
-                        </select>
-                    </div>
-
-                    {/* Status */}
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase mb-2">{t.logStatus}</label>
-                        <select 
-                            value={filters.status}
-                            onChange={(e) => setFilters({...filters, status: e.target.value})}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-purple-500 transition-colors"
-                        >
-                            <option value="all">{t.allStatuses}</option>
-                            <option value="completed">{t.completedOnly}</option>
-                            <option value="overdue">{t.overdueOnly}</option>
-                            <option value="corrective">{t.correctiveOnly}</option>
-                        </select>
-                    </div>
-
-                    {/* Output Format */}
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase mb-2">{t.outputFormat}</label>
-                        <div className="flex gap-2">
-                            {['pdf', 'xlsx', 'csv'].map(fmt => (
-                                <button
-                                    key={fmt}
-                                    onClick={() => setFilters({...filters, format: fmt})}
-                                    className={`flex-1 py-3 rounded-xl text-sm font-bold uppercase border-2 transition-all ${
-                                        filters.format === fmt 
-                                            ? 'border-purple-600 bg-purple-50 text-purple-700' 
-                                            : 'border-slate-200 bg-white text-slate-400 hover:border-slate-300'
-                                    }`}
-                                >
-                                    {fmt}
-                                </button>
+                {/* Other Pending Tasks */}
+                {otherTasks.length > 0 && (
+                    <div className="mb-8 animate-in slide-in-from-bottom-4 duration-500 delay-200">
+                        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 ml-1">{t.comingUp}</h2>
+                        <div className="flex flex-col gap-3">
+                            {otherTasks.map(task => (
+                                <CompactTaskCard key={task.id} task={task} onClick={() => onStartTask(task)} lang={lang} />
                             ))}
                         </div>
                     </div>
-                </div>
+                )}
 
-                <div className="border-t border-slate-100 pt-6 flex justify-end">
-                    <button 
-                        onClick={handleGenerate}
-                        disabled={generating}
-                        className={`bg-slate-900 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 ${generating ? 'opacity-70 cursor-wait' : ''}`}
-                    >
-                        {generating ? (
-                            <><div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"/> {t.downloading}</>
-                        ) : (
-                            <><Download size={20} /> {t.generateReport}</>
-                        )}
-                    </button>
-                </div>
-            </div>
-
-            {reportReady && (
-                <div className="bg-green-50 border border-green-200 text-green-800 p-4 rounded-xl flex items-center justify-between animate-in slide-in-from-top-4 fade-in">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-green-100 p-2 rounded-full">
-                            <Check size={20} className="text-green-600" />
-                        </div>
-                        <span className="font-bold">{t.reportReady}</span>
-                    </div>
-                    <button className="text-sm font-bold underline hover:text-green-900">{t.download} Report.{filters.format}</button>
-                </div>
-            )}
-
-            {/* Recent Reports Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="p-6 border-b border-slate-100">
-                    <h3 className="font-bold text-slate-800">{t.recentReports}</h3>
-                </div>
-                <div className="divide-y divide-slate-100">
-                    {MOCK_RECENT_REPORTS.map(report => (
-                        <div key={report.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                            <div className="flex items-center gap-3">
-                                <div className={`p-2 rounded-lg ${report.type === 'PDF' ? 'bg-red-50 text-red-600' : report.type === 'XLSX' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'}`}>
-                                    {report.type === 'PDF' ? <FileText size={20} /> : report.type === 'XLSX' ? <FileSpreadsheet size={20} /> : <FileText size={20} />}
-                                </div>
-                                <div>
-                                    <div className="font-bold text-sm text-slate-800">{report.name}</div>
-                                    <div className="text-xs text-slate-400">{report.date} • {report.size}</div>
-                                </div>
+                {/* History / Completed */}
+                {completedTasks.length > 0 && (
+                    <div className="animate-in slide-in-from-bottom-4 duration-500 delay-300">
+                        <button 
+                            onClick={() => setShowHistory(!showHistory)}
+                            className="flex items-center justify-between w-full text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 ml-1"
+                        >
+                            <span>{t.completedToday} ({completedCount})</span>
+                            {showHistory ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        </button>
+                        
+                        {showHistory && (
+                            <div className="flex flex-col gap-3 mb-8">
+                                {completedTasks.map(task => (
+                                    <CompletedTaskCard key={task.id} task={task} lang={lang} />
+                                ))}
                             </div>
-                            <button className="text-slate-400 hover:text-purple-600 p-2">
-                                <Download size={18} />
-                            </button>
-                        </div>
-                    ))}
-                </div>
+                        )}
+                    </div>
+                )}
+            </div>
+            
+            {/* Mobile Nav */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-3 pb-6 flex justify-around items-center z-40 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+                 <button className="flex flex-col items-center gap-1 text-slate-800">
+                    <ClipboardList size={24} />
+                    <span className="text-[10px] font-bold">Tasks</span>
+                 </button>
+                 <button className="flex flex-col items-center gap-1 text-slate-400">
+                    <BarChart3 size={24} />
+                    <span className="text-[10px] font-bold">{t.viewReports}</span>
+                 </button>
+                 <button className="flex flex-col items-center gap-1 text-slate-400">
+                    <History size={24} />
+                    <span className="text-[10px] font-bold">{t.history}</span>
+                 </button>
             </div>
         </div>
     );
-};
-
-// --- MAIN APP ---
-
-const App = () => {
-  const [activeTab, setActiveTab] = useState<'manager' | 'supervisor'>('manager');
-  const [tasks, setTasks] = useState(INITIAL_TASKS);
-  const [activeTask, setActiveTask] = useState<any>(null);
-  
-  // Auth State
-  const [user, setUser] = useState<any>(null);
-  const [loginStep, setLoginStep] = useState(0); // 0: Login, 1: App
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
-
-  // Localization State
-  const [lang, setLang] = useState<'en' | 'es'>('en');
-  const t = TRANSLATIONS[lang];
-
-  const toggleLang = () => setLang(l => l === 'en' ? 'es' : 'en');
-
-  // Supervisor State
-  const [selectedSchool, setSelectedSchool] = useState<any>(null);
-  const [supervisorView, setSupervisorView] = useState<'dashboard' | 'team' | 'reports'>('dashboard');
-  const [teamMembers, setTeamMembers] = useState(USERS_DB.filter(u => u.role === 'manager'));
-  const [showAddUserModal, setShowAddUserModal] = useState(false);
-  const [newUser, setNewUser] = useState({ firstName: '', lastName: '', email: '', location: '' });
-
-  // Handle Login
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    const foundUser = USERS_DB.find(u => u.username === username && u.password === password);
-    if (foundUser) {
-        setUser(foundUser);
-        setLoginStep(1);
-        setLoginError('');
-        // Set default view based on role
-        setActiveTab(foundUser.role === 'supervisor' ? 'supervisor' : 'manager');
-    } else {
-        setLoginError(t.invalidCredentials);
-    }
-  };
-
-  const handleLogout = () => {
-      setUser(null);
-      setLoginStep(0);
-      setUsername('');
-      setPassword('');
-      setActiveTask(null);
-      setSelectedSchool(null);
-  };
-
-  // User Management Functions
-  const handleAddUser = (e: React.FormEvent) => {
-      e.preventDefault();
-      const id = teamMembers.length + 10;
-      const createdUser = {
-          id,
-          username: newUser.email.split('@')[0],
-          password: 'pass', // Default
-          role: 'manager',
-          firstName: newUser.firstName,
-          lastName: newUser.lastName,
-          location: newUser.location,
-          email: newUser.email,
-          status: 'Active',
-          lastLogin: 'Never'
-      };
-      setTeamMembers([...teamMembers, createdUser]);
-      setShowAddUserModal(false);
-      setNewUser({ firstName: '', lastName: '', email: '', location: '' });
-  };
-
-  const handleDeleteUser = (id: number) => {
-      if(confirm('Are you sure you want to remove this user?')) {
-          setTeamMembers(teamMembers.filter(m => m.id !== id));
-      }
-  };
-
-  const toggleTask = (id: number, val: string) => {
-    setTasks(tasks.map(t => 
-      t.id === id ? { ...t, status: 'completed', value: val } : t
-    ));
-    setActiveTask(null);
   };
   
-  const completedCount = tasks.filter(t => t.status === 'completed').length;
-  const progress = Math.round((completedCount / tasks.length) * 100);
+  // --- SUPERVISOR COMPONENTS ---
 
-  // Filter tasks for current user's location if manager
-  const visibleTasks = user?.role === 'manager' 
-    ? tasks.filter(t => t.location.includes(user.location) || true) // Show all for demo
-    : tasks;
+  const SupervisorDashboard = ({ onViewMobile, lang }: { onViewMobile: () => void, lang: 'en' | 'es' }) => {
+    const t = TRANSLATIONS[lang];
+    const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(null);
+    const [view, setView] = useState<'overview' | 'team' | 'reports'>('overview');
+    
+    // Team Management State
+    const [showAddManager, setShowAddManager] = useState(false);
+    const [users, setUsers] = useState(USERS_DB.filter(u => u.role === 'manager'));
+    const [newManager, setNewManager] = useState({ firstName: '', lastName: '', location: '' });
 
-  if (loginStep === 0) {
-      return (
-          <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 font-sans">
-              
-              {/* Language Switcher */}
-              <button 
-                onClick={toggleLang}
-                className="fixed top-6 right-6 bg-white/10 text-white p-2 rounded-full hover:bg-white/20 transition-colors flex items-center gap-2 px-4"
-              >
-                  <Globe size={16} />
-                  <span className="text-sm font-bold">{lang.toUpperCase()}</span>
-              </button>
+    // Reports State
+    const [reportConfig, setReportConfig] = useState({
+        range: 'week',
+        school: 'all',
+        type: 'all',
+        status: 'all',
+        format: 'pdf'
+    });
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [generationSuccess, setGenerationSuccess] = useState(false);
 
-              <div className="bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
-                  <div className="text-center mb-8">
-                      <div className="w-16 h-16 bg-blue-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg transform rotate-3">
-                        <ClipboardList className="text-white" size={32} />
-                      </div>
-                      <h1 className="text-2xl font-bold text-slate-800">{t.appTitle}</h1>
-                      <p className="text-slate-500">{t.appSubtitle}</p>
-                  </div>
-                  
-                  <form onSubmit={handleLogin} className="space-y-4">
-                      <div>
-                          <label className="block text-xs font-bold text-slate-400 uppercase mb-1">{t.username}</label>
-                          <div className="relative">
-                              <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                              <input 
-                                type="text" 
-                                value={username}
-                                onChange={e => setUsername(e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-12 pr-4 outline-none focus:border-blue-500 focus:bg-white transition-colors"
-                                placeholder={t.username}
-                              />
-                          </div>
-                      </div>
-                      <div>
-                          <label className="block text-xs font-bold text-slate-400 uppercase mb-1">{t.password}</label>
-                          <div className="relative">
-                              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                              <input 
-                                type="password"
-                                value={password}
-                                onChange={e => setPassword(e.target.value)} 
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-12 pr-4 outline-none focus:border-blue-500 focus:bg-white transition-colors"
-                                placeholder="••••••••"
-                              />
-                          </div>
-                      </div>
-                      
-                      {loginError && (
-                          <div className="text-red-500 text-sm text-center font-medium bg-red-50 py-2 rounded-lg">
-                              {loginError}
-                          </div>
-                      )}
+    // Calculate Summary Metrics
+    const avgCompliance = Math.round(DISTRICT_SCHOOLS.reduce((acc, curr) => acc + curr.compliance, 0) / DISTRICT_SCHOOLS.length);
+    const totalIssues = DISTRICT_SCHOOLS.reduce((acc, curr) => acc + curr.missingLogs, 0);
 
-                      <button className="w-full bg-slate-900 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all mt-4">
-                          {t.loginBtn}
-                      </button>
-                  </form>
+    const handleDeleteUser = (id: number) => {
+        setUsers(users.filter(u => u.id !== id));
+    };
 
-                  <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-                      <p className="text-xs text-slate-400 mb-2">{t.demoCredentials}</p>
-                      <div className="flex gap-2 justify-center text-xs">
-                          <span className="bg-blue-50 text-blue-800 px-2 py-1 rounded border border-blue-100">Manager: maria / pass</span>
-                          <span className="bg-purple-50 text-purple-800 px-2 py-1 rounded border border-purple-100">Supervisor: sarah / pass</span>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      );
-  }
+    const handleAddUser = () => {
+        const newUser = {
+            id: users.length + 5,
+            username: newManager.firstName.toLowerCase(),
+            password: 'pass', // Default temp password
+            role: 'manager',
+            firstName: newManager.firstName,
+            lastName: newManager.lastName,
+            location: newManager.location || 'Unassigned',
+            email: `${newManager.firstName.charAt(0).toLowerCase()}.${newManager.lastName.toLowerCase()}@school.edu`,
+            status: 'Active',
+            lastLogin: 'Never'
+        };
+        setUsers([...users, newUser]);
+        setShowAddManager(false);
+        setNewManager({ firstName: '', lastName: '', location: '' });
+    };
 
-  // --- MANAGER VIEW ---
-  if (activeTab === 'manager') {
+    const handleGenerateReport = () => {
+        setIsGenerating(true);
+        setGenerationSuccess(false);
+        setTimeout(() => {
+            setIsGenerating(false);
+            setGenerationSuccess(true);
+        }, 2000);
+    };
+    
+    const selectedSchool = DISTRICT_SCHOOLS.find(s => s.id === selectedSchoolId);
+  
     return (
-      <div className="min-h-screen bg-slate-100 font-sans pb-20 max-w-md mx-auto shadow-2xl relative overflow-hidden">
-        {/* Mobile Status Bar */}
-        <div className="bg-slate-900 text-white px-6 py-4 pb-8 rounded-b-[2.5rem] shadow-xl relative z-10">
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex items-center gap-3">
-               <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20">
-                 <UserIcon size={20} className="text-white" />
-               </div>
-               <div>
-                  <h1 className="text-lg font-bold leading-tight">{t.goodMorning}, {user.firstName}</h1>
-                  <p className="text-xs text-slate-400 flex items-center gap-1">
-                    <MapPin size={10} /> {user.location}
-                  </p>
-               </div>
-            </div>
-            <div className="flex gap-2">
-                {/* Language Toggle Mobile */}
-                <button onClick={toggleLang} className="text-slate-400 hover:text-white transition-colors p-1">
-                    <Globe size={20} />
-                </button>
-                <div className="flex items-center gap-1 text-[10px] bg-green-500/20 px-2 py-1 rounded-full text-green-300 border border-green-500/30">
-                    <Wifi size={10} />
-                    <span>{t.online}</span>
-                </div>
-                <button onClick={handleLogout} className="text-slate-400 hover:text-white transition-colors">
-                    <LogOut size={20} />
-                </button>
-            </div>
+      <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
+        {/* Sidebar */}
+        <div className="w-full md:w-64 bg-slate-900 text-white flex flex-col shrink-0">
+          <div className="p-6 border-b border-slate-800">
+            <h1 className="text-xl font-bold tracking-tight">{t.commandCenter}</h1>
+            <p className="text-slate-400 text-sm mt-1">{t.welcomeBack}</p>
           </div>
-
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
-            <div className="flex justify-between text-xs text-slate-300 mb-2 uppercase tracking-wider font-semibold">
-              <span>{t.dailyProgress}</span>
-              <span>{progress}%</span>
-            </div>
-            <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-blue-400 to-cyan-300 transition-all duration-1000 ease-out"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <div className="mt-3 flex gap-4 text-xs font-medium text-slate-300">
-               <span className="flex items-center gap-1"><Check size={12} className="text-green-400"/> {completedCount} {t.done}</span>
-               <span className="flex items-center gap-1"><Clock size={12} className="text-yellow-400"/> {tasks.length - completedCount} {t.pending}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Task Feed */}
-        <div className="px-4 -mt-6 relative z-20">
-           <div className="flex justify-between items-center px-2 mb-2">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t.prioritizedTasks}</span>
-              <span className="text-xs text-slate-400">{new Date().toLocaleDateString()}</span>
-           </div>
-           
-           <div className="space-y-1 pb-24">
-            {visibleTasks.map(task => (
-                <TaskCard 
-                  key={task.id} 
-                  task={task} 
-                  onClick={() => setActiveTask(task)} 
-                  lang={lang}
-                />
-            ))}
-           </div>
-        </div>
-
-        {/* Logging Modal */}
-        {activeTask && (
-          <LoggingScreen 
-            task={activeTask} 
-            onClose={() => setActiveTask(null)}
-            onComplete={toggleTask}
-            lang={lang}
-          />
-        )}
-
-        {/* Supervisor Toggle (Dev Only) */}
-        {user.role === 'supervisor' && (
+          <nav className="flex-1 p-4 space-y-2">
             <button 
-                onClick={() => setActiveTab('supervisor')}
-                className="fixed bottom-6 right-6 bg-purple-600 text-white p-4 rounded-full shadow-lg z-50 hover:scale-105 transition-transform"
+                onClick={() => setView('overview')}
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${view === 'overview' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
             >
-                <BarChart3 size={24} />
+              <BarChart3 size={20} />
+              <span className="font-medium">{t.overview}</span>
             </button>
-        )}
-      </div>
-    );
-  }
-
-  // --- SUPERVISOR VIEW ---
-  return (
-    <div className="min-h-screen bg-slate-50 font-sans">
-      {/* Supervisor Header */}
-      <div className="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-30">
-        <div className="flex items-center gap-4">
-          <div className="bg-purple-100 p-2 rounded-lg">
-             <BarChart3 className="text-purple-700" size={24} />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-slate-800">{t.commandCenter}</h1>
-            <p className="text-sm text-slate-500">{t.welcomeBack} {user.lastName}</p>
+            <button 
+                onClick={() => setView('team')}
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${view === 'team' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+            >
+              <Users size={20} />
+              <span className="font-medium">{t.teamMgmt}</span>
+            </button>
+            <button 
+                onClick={() => setView('reports')}
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${view === 'reports' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+            >
+              <FileSpreadsheet size={20} />
+              <span className="font-medium">{t.reports}</span>
+            </button>
+          </nav>
+          <div className="p-4 border-t border-slate-800">
+            <button 
+              onClick={onViewMobile}
+              className="w-full flex items-center justify-center space-x-2 bg-slate-800 hover:bg-slate-700 text-white py-2 rounded-lg text-sm transition-colors border border-slate-700"
+            >
+              <Phone size={16} />
+              <span>{t.viewMobile}</span>
+            </button>
           </div>
         </div>
-        
-        <div className="flex items-center gap-6">
+  
+        {/* Main Content */}
+        <div className="flex-1 p-8 overflow-y-auto">
             
-            {/* View Tabs */}
-            <div className="flex bg-slate-100 p-1 rounded-xl">
-                <button 
-                    onClick={() => setSupervisorView('dashboard')}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${supervisorView === 'dashboard' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
-                >
-                    {t.overview}
-                </button>
-                <button 
-                    onClick={() => setSupervisorView('team')}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${supervisorView === 'team' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
-                >
-                    {t.teamMgmt}
-                </button>
-                <button 
-                    onClick={() => setSupervisorView('reports')}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${supervisorView === 'reports' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
-                >
-                    {t.reports}
-                </button>
-            </div>
-
-            <div className="h-8 w-px bg-slate-200" />
-
-            {/* Language Toggle Desktop */}
-            <button 
-                onClick={toggleLang}
-                className="flex items-center gap-2 text-slate-500 hover:text-purple-600 transition-colors text-sm font-bold bg-slate-100 px-3 py-1.5 rounded-lg"
-            >
-                <Globe size={16} /> {lang.toUpperCase()}
-            </button>
-            
-            <button onClick={handleLogout} className="flex items-center gap-2 text-slate-500 hover:text-red-600 transition-colors text-sm font-medium">
-                <LogOut size={16} /> {t.logout}
-            </button>
-            
-            {/* Mobile View Toggle */}
-            <button 
-                onClick={() => setActiveTab('manager')}
-                className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold shadow hover:bg-slate-800 transition-colors"
-            >
-                {t.viewMobile}
-            </button>
-        </div>
-      </div>
-
-      <div className="p-8 max-w-7xl mx-auto">
-        
-        {supervisorView === 'reports' ? (
-            <ReportsView lang={lang} />
-        ) : supervisorView === 'dashboard' ? (
-        <div className="space-y-8">
-            {/* Summary Statistics Section */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* District Health Card */}
-                <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="bg-blue-100 p-2 rounded-lg text-blue-600">
-                            <Activity size={24} />
-                        </div>
-                        <span className="text-xs font-bold text-slate-400 uppercase bg-slate-50 px-2 py-1 rounded">{t.districtHealth}</span>
-                    </div>
-                    <div>
-                         {/* Calculate Average Compliance */}
-                         <div className="text-4xl font-bold text-slate-800 mb-1">
-                             {Math.round(DISTRICT_SCHOOLS.reduce((acc, s) => acc + s.compliance, 0) / DISTRICT_SCHOOLS.length)}%
-                         </div>
-                         <div className="text-sm text-slate-500 font-medium">{t.districtAvg}</div>
-                    </div>
-                    <div className="mt-4 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                        <div className="h-full bg-blue-500" style={{ width: `${Math.round(DISTRICT_SCHOOLS.reduce((acc, s) => acc + s.compliance, 0) / DISTRICT_SCHOOLS.length)}%` }}></div>
-                    </div>
-                </div>
-
-                {/* Critical Alerts Card */}
-                <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="bg-red-100 p-2 rounded-lg text-red-600">
-                            <AlertTriangle size={24} />
-                        </div>
-                        <span className="text-xs font-bold text-red-100 bg-red-600 px-2 py-1 rounded uppercase animate-pulse">{t.requiresAttention}</span>
-                    </div>
-                    <div>
-                         {/* Calculate Total Critical Alerts */}
-                         <div className="text-4xl font-bold text-slate-800 mb-1">
-                             {DISTRICT_SCHOOLS.reduce((acc, s) => acc + (getSchoolStatus(s) === 'critical' || getSchoolStatus(s) === 'warning' ? 1 : 0), 0)}
-                         </div>
-                         <div className="text-sm text-slate-500 font-medium">{t.criticalAlerts}</div>
-                    </div>
-                </div>
-
-                 {/* Weekly Trend Card */}
-                 <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="bg-green-100 p-2 rounded-lg text-green-600">
+            {view === 'overview' && (
+                <>
+                {/* Summary Section */}
+                <div className="grid grid-cols-3 gap-6 mb-8">
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+                        <div className={`p-3 rounded-full ${avgCompliance >= 90 ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'}`}>
                             <TrendingUp size={24} />
                         </div>
-                        <span className="text-xs font-bold text-slate-400 uppercase bg-slate-50 px-2 py-1 rounded">{t.weeklyTrend}</span>
+                        <div>
+                            <div className="text-slate-500 text-sm font-bold uppercase tracking-wide">{t.districtHealth}</div>
+                            <div className="text-2xl font-bold text-slate-800">{avgCompliance}% <span className="text-sm text-slate-400 font-normal">{t.districtAvg}</span></div>
+                        </div>
                     </div>
-                    <div>
-                         <div className="text-4xl font-bold text-green-600 mb-1 flex items-center gap-2">
-                             +4.2%
-                         </div>
-                         <div className="text-sm text-slate-500 font-medium">{t.vsLastWeek}</div>
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+                        <div className={`p-3 rounded-full ${totalIssues > 0 ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
+                            <AlertTriangle size={24} />
+                        </div>
+                        <div>
+                            <div className="text-slate-500 text-sm font-bold uppercase tracking-wide">{t.criticalAlerts}</div>
+                            <div className="text-2xl font-bold text-slate-800">{totalIssues} <span className="text-sm text-slate-400 font-normal">{t.requiresAttention}</span></div>
+                        </div>
+                    </div>
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+                        <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+                            <Activity size={24} />
+                        </div>
+                        <div>
+                            <div className="text-slate-500 text-sm font-bold uppercase tracking-wide">{t.weeklyTrend}</div>
+                            <div className="text-2xl font-bold text-green-600 flex items-center">
+                                +4.2% <span className="text-sm text-slate-400 font-normal ml-2">{t.vsLastWeek}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="grid grid-cols-12 gap-8">
-                {/* Left Col: School List */}
-                <div className="col-span-7 space-y-4">
-                    <div className="flex justify-between items-center mb-2">
-                    <h2 className="font-bold text-slate-700 text-lg">{t.schoolCompliance}</h2>
-                    <button className="text-slate-400 hover:text-purple-600 transition-colors"><Search size={20} /></button>
-                    </div>
-                    
-                    {DISTRICT_SCHOOLS.map((school) => {
-                        // Get Dynamic Status
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* List */}
+                    <div className="lg:col-span-2 space-y-6">
+                    <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <BarChart3 className="text-slate-400" />
+                        {t.schoolCompliance}
+                    </h2>
+                    <div className="grid gap-4">
+                        {DISTRICT_SCHOOLS.map(school => {
                         const status = getSchoolStatus(school);
-                        
+                        const isSelected = selectedSchoolId === school.id;
                         return (
                             <div 
                             key={school.id}
-                            onClick={() => setSelectedSchool(school)}
-                            className={`bg-white p-5 rounded-xl border-l-4 shadow-sm hover:shadow-md transition-all cursor-pointer group ${
-                                status === 'critical' ? 'border-red-500' :
-                                status === 'warning' ? 'border-yellow-400' : 'border-green-500'
-                            } ${selectedSchool?.id === school.id ? 'ring-2 ring-purple-500' : ''}`}
+                            onClick={() => setSelectedSchoolId(school.id)}
+                            className={`group bg-white rounded-2xl p-5 cursor-pointer transition-all border-2 ${
+                                isSelected ? 'border-blue-500 shadow-md ring-4 ring-blue-50' : 'border-transparent shadow-sm hover:border-slate-200'
+                            }`}
                             >
-                            <div className="flex justify-between items-start">
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center space-x-4">
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg ${
+                                    status === 'good' ? 'bg-green-100 text-green-700' :
+                                    status === 'warning' ? 'bg-yellow-100 text-yellow-700' :
+                                    'bg-red-100 text-red-700'
+                                }`}>
+                                    {school.compliance}%
+                                </div>
                                 <div>
-                                    <h3 className="font-bold text-slate-800 text-lg group-hover:text-purple-700 transition-colors">{school.name}</h3>
-                                    <div className="flex items-center gap-4 mt-1 text-sm text-slate-500">
-                                        <span className="flex items-center gap-1"><UserIcon size={14}/> {school.manager}</span>
-                                        <span className="flex items-center gap-1"><Clock size={14}/> {t.active} {school.lastActive}</span>
-                                    </div>
+                                    <h3 className="font-bold text-slate-900 text-lg">{school.name}</h3>
+                                    <p className="text-slate-500 text-sm">Manager: {school.manager} • {school.lastActive}</p>
                                 </div>
-                                <div className="text-right">
-                                    <span className={`text-2xl font-bold ${
-                                        status === 'critical' ? 'text-red-600' : 
-                                        status === 'warning' ? 'text-yellow-600' : 'text-green-600'
-                                    }`}>
-                                        {school.compliance}%
-                                    </span>
-                                    <div className="text-xs font-bold text-slate-400 uppercase">{t.compliance}</div>
                                 </div>
+                                <ChevronRight className={`text-slate-300 transition-transform ${isSelected ? 'rotate-90 text-blue-500' : 'group-hover:text-slate-400'}`} />
                             </div>
                             
-                            {/* Health Bar */}
-                            <div className="mt-4 h-2 bg-slate-100 rounded-full overflow-hidden">
+                            {/* Progress Bar */}
+                            <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                                 <div 
-                                    className={`h-full rounded-full ${
-                                        status === 'critical' ? 'bg-red-500' : 
-                                        status === 'warning' ? 'bg-yellow-400' : 'bg-green-500'
-                                    }`} 
-                                    style={{ width: `${school.compliance}%` }} 
+                                className={`h-full rounded-full ${
+                                    status === 'good' ? 'bg-green-500' :
+                                    status === 'warning' ? 'bg-yellow-500' :
+                                    'bg-red-500'
+                                }`}
+                                style={{ width: `${school.compliance}%` }}
                                 />
                             </div>
-
-                            {/* Alerts */}
-                            {school.missingLogs > 0 && (
-                                <div className="mt-3 flex items-center gap-2 text-xs font-bold text-red-600 bg-red-50 px-3 py-1.5 rounded-lg w-fit">
-                                    <AlertTriangle size={14} />
-                                    {school.missingLogs} {t.missingLogs}
-                                </div>
-                            )}
                             </div>
                         );
-                    })}
-                </div>
-
-                {/* Right Col: Detail View */}
-                <div className="col-span-5">
+                        })}
+                    </div>
+                    </div>
+        
+                    {/* Detail Panel */}
+                    <div className="bg-white rounded-3xl shadow-lg border border-slate-100 overflow-hidden flex flex-col h-[600px] sticky top-8">
                     {selectedSchool ? (
-                        <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden sticky top-28 animate-in slide-in-from-right duration-300">
-                            <div className="bg-slate-900 text-white p-6">
-                                <h2 className="text-xl font-bold">{selectedSchool.name}</h2>
-                                <p className="text-slate-400 text-sm">Manager: {selectedSchool.manager}</p>
+                        <>
+                        <div className="p-6 border-b border-slate-100 bg-slate-50/50">
+                            <h2 className="text-xl font-bold text-slate-800 mb-1">{selectedSchool.name}</h2>
+                            <div className="flex items-center space-x-2 text-sm text-slate-500">
+                                <span className={`inline-block w-2.5 h-2.5 rounded-full ${
+                                    getSchoolStatus(selectedSchool) === 'good' ? 'bg-green-500' :
+                                    getSchoolStatus(selectedSchool) === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
+                                }`}></span>
+                                <span className="uppercase font-bold tracking-wider text-xs">{t.compliance}: {selectedSchool.compliance}%</span>
                             </div>
-                            
-                            <div className="p-6">
-                                <div className="flex gap-2 mb-6">
-                                    <button className="flex-1 bg-purple-600 text-white py-2 rounded-lg font-bold text-sm hover:bg-purple-700 transition-colors flex items-center justify-center gap-2">
-                                        <Phone size={16} /> {t.call}
+                        </div>
+                        
+                        <div className="p-6 flex-1 overflow-y-auto">
+                            {selectedSchool.missingLogs > 0 ? (
+                            <div className="mb-6">
+                                <div className="flex items-center space-x-2 text-red-600 mb-4 bg-red-50 p-3 rounded-lg">
+                                <AlertTriangle size={20} />
+                                <span className="font-bold text-sm">{selectedSchool.missingLogs} {t.missingLogs}</span>
+                                </div>
+                                <div className="space-y-3">
+                                {selectedSchool.issues.map(issue => (
+                                    <div key={issue.id} className="flex items-start p-3 bg-white border border-red-100 rounded-xl shadow-sm">
+                                    <div className={`mt-1 w-2 h-2 rounded-full mr-3 shrink-0 ${issue.severity === 'high' ? 'bg-red-500' : 'bg-yellow-500'}`} />
+                                    <div>
+                                        <h4 className="font-bold text-slate-800 text-sm">{issue.title}</h4>
+                                        <p className="text-slate-500 text-xs mt-0.5">{issue.desc}</p>
+                                    </div>
+                                    </div>
+                                ))}
+                                </div>
+                            </div>
+                            ) : (
+                            <div className="text-center py-12">
+                                <div className="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Check size={32} />
+                                </div>
+                                <p className="text-slate-500 font-medium">{t.noIssues}</p>
+                            </div>
+                            )}
+
+                            <div className="space-y-4 pt-4 border-t border-slate-100">
+                                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t.actionItems}</h3>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button className="flex items-center justify-center space-x-2 bg-slate-900 text-white py-3 rounded-xl font-bold text-sm hover:bg-slate-800 transition-colors">
+                                        <Phone size={16} />
+                                        <span>{t.call}</span>
                                     </button>
-                                    <button className="flex-1 bg-slate-100 text-slate-700 py-2 rounded-lg font-bold text-sm hover:bg-slate-200 transition-colors flex items-center justify-center gap-2">
-                                        <Send size={16} /> {t.email}
+                                    <button className="flex items-center justify-center space-x-2 bg-white border-2 border-slate-200 text-slate-700 py-3 rounded-xl font-bold text-sm hover:border-slate-300 transition-colors">
+                                        <Mail size={16} />
+                                        <span>{t.email}</span>
                                     </button>
                                 </div>
+                            </div>
 
-                                <h3 className="font-bold text-slate-700 mb-3 flex items-center gap-2">
-                                    <AlertTriangle size={18} className="text-red-500" />
-                                    {t.actionItems}
-                                </h3>
-                                
-                                {selectedSchool.issues.length > 0 ? (
-                                    <div className="space-y-3">
-                                        {selectedSchool.issues.map((issue: any) => (
-                                            <div key={issue.id} className="border border-slate-200 p-4 rounded-xl hover:bg-slate-50 transition-colors">
-                                                <div className="flex justify-between items-start mb-1">
-                                                    <span className="font-bold text-slate-800 text-sm">{issue.title}</span>
-                                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                                                        issue.severity === 'high' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
-                                                    }`}>
-                                                        {issue.severity}
-                                                    </span>
-                                                </div>
-                                                <p className="text-sm text-slate-500">{issue.desc}</p>
+                            <div className="mt-8">
+                                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">{t.recentActivity}</h3>
+                                <div className="space-y-4">
+                                    {[1,2,3].map(i => (
+                                        <div key={i} className="flex items-center text-sm">
+                                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 mr-3 text-xs font-bold">
+                                                {12-i}:00
                                             </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="text-center py-8 text-slate-400">
-                                        <Check size={48} className="mx-auto mb-2 text-green-200" />
-                                        <p>{t.noIssues}</p>
-                                    </div>
-                                )}
-
-                                <div className="mt-6 pt-6 border-t border-slate-100">
-                                    <h4 className="font-bold text-slate-700 mb-2 text-sm">{t.recentActivity}</h4>
-                                    <div className="text-sm text-slate-500 space-y-2">
-                                        <div className="flex justify-between">
-                                            <span>Morning Cooler Check</span>
-                                            <span className="text-green-600 font-medium">Completed 7:15 AM</span>
+                                            <div>
+                                                <p className="text-slate-700 font-medium">Log verified by manager</p>
+                                                <p className="text-slate-400 text-xs">Cooler Check #{i}</p>
+                                            </div>
                                         </div>
-                                        <div className="flex justify-between">
-                                            <span>Sanitizer Test</span>
-                                            <span className="text-slate-400">{t.pending}</span>
-                                        </div>
-                                    </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>
+                        </>
                     ) : (
-                        <div className="h-full flex flex-col items-center justify-center text-slate-300 border-2 border-dashed border-slate-200 rounded-2xl p-8">
-                            <BarChart3 size={64} className="mb-4 opacity-50" />
-                            <p className="font-medium">{t.selectSchoolPrompt}</p>
+                        <div className="flex flex-col items-center justify-center h-full text-slate-400 p-8 text-center">
+                        <MapPin size={48} className="mb-4 opacity-20" />
+                        <p>{t.selectSchoolPrompt}</p>
                         </div>
                     )}
-                </div>
-            </div>
-        </div>
-        ) : (
-            // TEAM MANAGEMENT VIEW
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-                    <div>
-                        <h2 className="text-xl font-bold text-slate-800">{t.cafeteriaManagers}</h2>
-                        <p className="text-sm text-slate-500">{t.manageAccess}</p>
                     </div>
-                    <button 
-                        onClick={() => setShowAddUserModal(true)}
-                        className="bg-purple-600 text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-purple-700 transition-colors"
-                    >
-                        <Plus size={16} /> {t.addManager}
-                    </button>
                 </div>
-                
-                <table className="w-full text-left">
-                    <thead className="bg-slate-50 text-slate-500 text-xs uppercase font-bold">
-                        <tr>
-                            <th className="px-6 py-4">{t.name}</th>
-                            <th className="px-6 py-4">{t.location}</th>
-                            <th className="px-6 py-4">Email</th>
-                            <th className="px-6 py-4">{t.status}</th>
-                            <th className="px-6 py-4">{t.lastLogin}</th>
-                            <th className="px-6 py-4 text-right">{t.actions}</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                        {teamMembers.map((member) => (
-                            <tr key={member.id} className="hover:bg-slate-50 transition-colors">
-                                <td className="px-6 py-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-xs">
-                                            {member.firstName[0]}{member.lastName[0]}
-                                        </div>
-                                        <div>
-                                            <div className="font-bold text-slate-800 text-sm">{member.firstName} {member.lastName}</div>
-                                            <div className="text-xs text-slate-400">@{member.username}</div>
-                                        </div>
+                </>
+            )}
+
+            {view === 'team' && (
+                <div className="max-w-5xl mx-auto">
+                    <div className="flex justify-between items-center mb-8">
+                        <div>
+                            <h2 className="text-2xl font-bold text-slate-800">{t.cafeteriaManagers}</h2>
+                            <p className="text-slate-500">{t.manageAccess}</p>
+                        </div>
+                        <button 
+                            onClick={() => setShowAddManager(true)}
+                            className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
+                        >
+                            <Plus size={20} />
+                            {t.addManager}
+                        </button>
+                    </div>
+
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <table className="w-full text-left">
+                            <thead className="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">{t.name}</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">{t.location}</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">{t.email}</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">{t.status}</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">{t.lastLogin}</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">{t.actions}</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {users.map(user => (
+                                    <tr key={user.id} className="hover:bg-slate-50 transition-colors">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold">
+                                                    {user.firstName[0]}{user.lastName[0]}
+                                                </div>
+                                                <div>
+                                                    <div className="font-bold text-slate-800">{user.firstName} {user.lastName}</div>
+                                                    <div className="text-xs text-slate-500">@{user.username}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-slate-600 text-sm">{user.location}</td>
+                                        <td className="px-6 py-4 text-slate-600 text-sm">{user.email}</td>
+                                        <td className="px-6 py-4">
+                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                                                {t.active}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-slate-500 text-sm">{user.lastLogin}</td>
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex justify-end gap-2">
+                                                <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                                    <Lock size={16} />
+                                                </button>
+                                                <button 
+                                                    onClick={() => handleDeleteUser(user.id)}
+                                                    className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+
+            {view === 'reports' && (
+                <div className="max-w-5xl mx-auto">
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold text-slate-800">{t.customQueryBuilder}</h2>
+                        <p className="text-slate-500">{t.generateReport}</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* Config Panel */}
+                        <div className="lg:col-span-2 space-y-6">
+                            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                                <div className="grid grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t.dateRange}</label>
+                                        <select 
+                                            className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 font-medium text-slate-700 focus:border-blue-500 outline-none"
+                                            value={reportConfig.range}
+                                            onChange={(e) => setReportConfig({...reportConfig, range: e.target.value})}
+                                        >
+                                            <option value="today">{t.today}</option>
+                                            <option value="week">{t.thisWeek}</option>
+                                            <option value="month">{t.thisMonth}</option>
+                                            <option value="custom">{t.custom}</option>
+                                        </select>
                                     </div>
-                                </td>
-                                <td className="px-6 py-4 text-sm text-slate-600">{member.location}</td>
-                                <td className="px-6 py-4 text-sm text-slate-500">{member.email}</td>
-                                <td className="px-6 py-4">
-                                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">{t.active}</span>
-                                </td>
-                                <td className="px-6 py-4 text-sm text-slate-500">{member.lastLogin}</td>
-                                <td className="px-6 py-4 text-right">
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t.schools}</label>
+                                        <select 
+                                            className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 font-medium text-slate-700 focus:border-blue-500 outline-none"
+                                            value={reportConfig.school}
+                                            onChange={(e) => setReportConfig({...reportConfig, school: e.target.value})}
+                                        >
+                                            <option value="all">{t.allSchools}</option>
+                                            {DISTRICT_SCHOOLS.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t.logType}</label>
+                                        <select 
+                                            className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 font-medium text-slate-700 focus:border-blue-500 outline-none"
+                                            value={reportConfig.type}
+                                            onChange={(e) => setReportConfig({...reportConfig, type: e.target.value})}
+                                        >
+                                            <option value="all">{t.allLogs}</option>
+                                            <option value="temp">Temperature Logs</option>
+                                            <option value="chemical">Sanitizer Logs</option>
+                                            <option value="calibration">Calibration Logs</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t.logStatus}</label>
+                                        <select 
+                                            className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 font-medium text-slate-700 focus:border-blue-500 outline-none"
+                                            value={reportConfig.status}
+                                            onChange={(e) => setReportConfig({...reportConfig, status: e.target.value})}
+                                        >
+                                            <option value="all">{t.allStatuses}</option>
+                                            <option value="completed">{t.completedOnly}</option>
+                                            <option value="overdue">{t.overdueOnly}</option>
+                                            <option value="corrective">{t.correctiveOnly}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">{t.outputFormat}</label>
+                                    <div className="flex gap-4">
+                                        {['PDF', 'Excel', 'CSV'].map(fmt => (
+                                            <button 
+                                                key={fmt}
+                                                onClick={() => setReportConfig({...reportConfig, format: fmt.toLowerCase()})}
+                                                className={`flex-1 py-3 rounded-xl border-2 font-bold transition-all ${
+                                                    reportConfig.format === fmt.toLowerCase()
+                                                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                                    : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
+                                                }`}
+                                            >
+                                                {fmt}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="mt-8 pt-6 border-t border-slate-100">
                                     <button 
-                                        onClick={() => handleDeleteUser(member.id)}
-                                        className="text-slate-400 hover:text-red-500 transition-colors p-2"
+                                        onClick={handleGenerateReport}
+                                        disabled={isGenerating}
+                                        className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold shadow-lg shadow-slate-200 hover:bg-slate-800 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
                                     >
-                                        <Trash2 size={16} />
+                                        {isGenerating ? (
+                                            <>
+                                                <RefreshCw className="animate-spin" />
+                                                {t.downloading}
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Download />
+                                                {t.generateReport}
+                                            </>
+                                        )}
                                     </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                                </div>
+                                
+                                {generationSuccess && (
+                                    <div className="mt-4 p-4 bg-green-50 text-green-700 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+                                        <CheckCircle className="shrink-0" />
+                                        <span className="font-medium">{t.reportReady}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Recent Reports */}
+                        <div>
+                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 h-full">
+                                <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                    <Clock size={18} className="text-slate-400" />
+                                    {t.recentReports}
+                                </h3>
+                                <div className="space-y-3">
+                                    {MOCK_RECENT_REPORTS.map(report => (
+                                        <div key={report.id} className="p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors group cursor-pointer border border-slate-100">
+                                            <div className="flex justify-between items-start mb-1">
+                                                <div className="font-bold text-slate-700 text-sm group-hover:text-blue-700 transition-colors">{report.name}</div>
+                                                <div className="text-[10px] font-bold bg-white px-2 py-0.5 rounded text-slate-500 border border-slate-200">{report.type}</div>
+                                            </div>
+                                            <div className="flex justify-between items-center text-xs text-slate-400">
+                                                <span>{report.date}</span>
+                                                <span>{report.size}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button className="w-full mt-4 text-sm font-bold text-blue-600 hover:text-blue-800 py-2">
+                                    View All History
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+
+        {/* Add Manager Modal */}
+        {showAddManager && (
+            <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+                <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200">
+                    <h2 className="text-xl font-bold text-slate-800 mb-4">{t.addManagerTitle}</h2>
+                    <div className="space-y-4 mb-6">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{t.firstName}</label>
+                                <input 
+                                    className="w-full p-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none"
+                                    value={newManager.firstName}
+                                    onChange={e => setNewManager({...newManager, firstName: e.target.value})}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{t.lastName}</label>
+                                <input 
+                                    className="w-full p-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none"
+                                    value={newManager.lastName}
+                                    onChange={e => setNewManager({...newManager, lastName: e.target.value})}
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{t.location}</label>
+                            <select 
+                                className="w-full p-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none bg-white"
+                                value={newManager.location}
+                                onChange={e => setNewManager({...newManager, location: e.target.value})}
+                            >
+                                <option value="">Select School...</option>
+                                <option value="Lincoln MS">Lincoln MS</option>
+                                <option value="North High">North High</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div className="flex gap-3">
+                        <button 
+                            onClick={() => setShowAddManager(false)}
+                            className="flex-1 py-3 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+                        >
+                            {t.cancel}
+                        </button>
+                        <button 
+                            onClick={handleAddUser}
+                            disabled={!newManager.firstName || !newManager.lastName}
+                            className="flex-1 py-3 rounded-xl font-bold bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200 disabled:opacity-50 disabled:shadow-none"
+                        >
+                            {t.createUser}
+                        </button>
+                    </div>
+                </div>
             </div>
         )}
       </div>
+    );
+  };
+  
+  // --- MAIN APP COMPONENT ---
 
-      {/* Add User Modal */}
-      {showAddUserModal && (
-          <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in zoom-in duration-200">
-                  <div className="flex justify-between items-center mb-6">
-                      <h3 className="font-bold text-xl text-slate-800">{t.addManagerTitle}</h3>
-                      <button onClick={() => setShowAddUserModal(false)} className="text-slate-400 hover:text-slate-600">
-                          <X size={24} />
-                      </button>
-                  </div>
-                  <form onSubmit={handleAddUser} className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                          <div>
-                              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t.firstName}</label>
-                              <input 
-                                required
-                                value={newUser.firstName}
-                                onChange={e => setNewUser({...newUser, firstName: e.target.value})}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:border-purple-500" 
-                              />
-                          </div>
-                          <div>
-                              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t.lastName}</label>
-                              <input 
-                                required
-                                value={newUser.lastName}
-                                onChange={e => setNewUser({...newUser, lastName: e.target.value})}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:border-purple-500" 
-                              />
-                          </div>
-                      </div>
-                      <div>
-                          <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Email Address</label>
-                          <input 
-                            required type="email"
-                            value={newUser.email}
-                            onChange={e => setNewUser({...newUser, email: e.target.value})}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:border-purple-500" 
-                          />
-                      </div>
-                      <div>
-                          <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t.location}</label>
-                          <select 
-                            required
-                            value={newUser.location}
-                            onChange={e => setNewUser({...newUser, location: e.target.value})}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:border-purple-500"
-                          >
-                              <option value="">Select School...</option>
-                              {DISTRICT_SCHOOLS.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
-                          </select>
-                      </div>
-                      <div className="pt-4 flex gap-3">
-                          <button type="button" onClick={() => setShowAddUserModal(false)} className="flex-1 bg-slate-100 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors">{t.cancel}</button>
-                          <button type="submit" className="flex-1 bg-purple-600 text-white font-bold py-3 rounded-xl hover:bg-purple-700 transition-colors">{t.createUser}</button>
-                      </div>
-                  </form>
-              </div>
+  const App = () => {
+    const [user, setUser] = useState<any>(null); 
+    const [tasks, setTasks] = useState(INITIAL_TASKS);
+    const [activeTask, setActiveTask] = useState<any>(null);
+    
+    // Global State
+    const [lang, setLang] = useState<'en' | 'es'>('en');
+
+    // Sync Simulation State
+    const [isOnline, setIsOnline] = useState(true);
+    const [pendingLogs, setPendingLogs] = useState<any[]>([]);
+    const [failedLogs, setFailedLogs] = useState<any[]>([]);
+    const [syncProgress, setSyncProgress] = useState(0);
+    const [showSyncModal, setShowSyncModal] = useState(false);
+    
+    // Login Form State
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [loginError, setLoginError] = useState(false);
+
+    // Sync Logic
+    useEffect(() => {
+        let interval: any;
+        if (isOnline && pendingLogs.length > 0) {
+            processSyncQueue();
+        }
+        return () => clearInterval(interval);
+    }, [isOnline, pendingLogs]);
+
+    const processSyncQueue = async () => {
+        if (pendingLogs.length === 0) return;
+        
+        // Take first item
+        const itemToSync = pendingLogs[0];
+        setSyncProgress(10); // Start
+
+        // Simulate upload delay
+        const duration = 1500;
+        const steps = 10;
+        let step = 0;
+        
+        const progressInterval = setInterval(() => {
+            step++;
+            setSyncProgress(10 + (step/steps) * 80);
+        }, duration / steps);
+
+        setTimeout(() => {
+            clearInterval(progressInterval);
+            
+            // Random failure simulation (10% chance) or purely success for demo
+            const shouldFail = Math.random() < 0.1; 
+            
+            if (shouldFail) {
+                setFailedLogs(prev => [...prev, { ...itemToSync, error: TRANSLATIONS[lang].errorTimeout }]);
+                setPendingLogs(prev => prev.slice(1));
+            } else {
+                setPendingLogs(prev => prev.slice(1));
+            }
+            
+            setSyncProgress(0);
+        }, duration);
+    };
+
+    const retryFailedLog = (logId: number) => {
+        const log = failedLogs.find(l => l.taskId === logId);
+        if (log) {
+            setFailedLogs(prev => prev.filter(l => l.taskId !== logId));
+            setPendingLogs(prev => [...prev, log]);
+        }
+    };
+
+    const handleLogin = (e: React.FormEvent) => {
+        e.preventDefault();
+        const foundUser = USERS_DB.find(u => u.username === username.toLowerCase() && u.password === password);
+        if (foundUser) {
+            setUser(foundUser);
+            setLoginError(false);
+        } else {
+            setLoginError(true);
+        }
+    };
+
+    const handleTaskComplete = (id: number, val: string) => {
+      // Optimistic update
+      setTasks(tasks.map(t => 
+        t.id === id ? { ...t, status: 'completed', value: val, lastLog: { time: 'Just now', value: val } } : t
+      ));
+      
+      // Add to sync queue
+      setPendingLogs(prev => [...prev, { taskId: id, value: val, timestamp: new Date() }]);
+      
+      setActiveTask(null);
+    };
+
+    const toggleLang = () => setLang(prev => prev === 'en' ? 'es' : 'en');
+    const t = TRANSLATIONS[lang];
+
+    if (!user) {
+        return (
+            <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+                <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-purple-500" />
+                    <button 
+                        onClick={toggleLang}
+                        className="absolute top-4 right-4 flex items-center gap-1 text-slate-400 hover:text-slate-600 font-bold text-xs bg-slate-100 px-3 py-1.5 rounded-full transition-colors"
+                    >
+                        <Globe size={14} />
+                        {lang.toUpperCase()}
+                    </button>
+
+                    <div className="text-center mb-8">
+                        <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-blue-600 transform rotate-3">
+                            <ClipboardList size={32} />
+                        </div>
+                        <h1 className="text-3xl font-black text-slate-800 tracking-tight">{t.appTitle}</h1>
+                        <p className="text-slate-500 font-medium">{t.appSubtitle}</p>
+                    </div>
+
+                    <form onSubmit={handleLogin} className="space-y-4">
+                        <div>
+                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 ml-1">{t.username}</label>
+                            <div className="relative">
+                                <UserIcon className="absolute left-4 top-3.5 text-slate-400" size={20} />
+                                <input 
+                                    type="text"
+                                    value={username}
+                                    onChange={e => setUsername(e.target.value)}
+                                    className="w-full pl-12 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-blue-500 focus:bg-white outline-none font-bold text-slate-700 transition-all"
+                                    placeholder={t.username}
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 ml-1">{t.password}</label>
+                            <div className="relative">
+                                <Lock className="absolute left-4 top-3.5 text-slate-400" size={20} />
+                                <input 
+                                    type="password"
+                                    value={password}
+                                    onChange={e => setPassword(e.target.value)}
+                                    className="w-full pl-12 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-blue-500 focus:bg-white outline-none font-bold text-slate-700 transition-all"
+                                    placeholder="••••••"
+                                />
+                            </div>
+                        </div>
+
+                        {loginError && (
+                            <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm font-bold flex items-center gap-2 animate-in slide-in-from-left-2">
+                                <AlertTriangle size={16} />
+                                {t.invalidCredentials}
+                            </div>
+                        )}
+
+                        <button className="w-full bg-slate-900 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-slate-800 active:scale-[0.98] transition-all mt-4">
+                            {t.loginBtn}
+                        </button>
+                    </form>
+
+                    <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">{t.demoCredentials}</p>
+                        <div className="flex justify-center gap-4 text-xs font-mono text-slate-500 bg-slate-50 p-3 rounded-xl inline-block w-full">
+                            <span>Manager: <span className="text-slate-900 font-bold">maria / pass</span></span>
+                            <span>Supervisor: <span className="text-slate-900 font-bold">sarah / pass</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+  
+    return (
+      <div className="h-screen flex flex-col font-sans bg-slate-50 text-slate-900 overflow-hidden">
+        {/* Top Bar for Demo */}
+        <div className="bg-slate-900 text-slate-400 py-2 px-4 flex justify-between items-center text-xs font-bold z-50 shrink-0">
+          <div className="flex items-center gap-4">
+            <span className="text-white flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                {user.role === 'manager' ? 'MANAGER VIEW (MOBILE)' : 'SUPERVISOR VIEW (DESKTOP)'}
+            </span>
           </div>
-      )}
-    </div>
-  );
-};
+          <div className="flex items-center gap-4">
+            {user.role === 'manager' && (
+                <button 
+                    onClick={() => setShowSyncModal(true)}
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-full transition-colors ${
+                        !isOnline || failedLogs.length > 0 
+                        ? 'bg-red-500/20 text-red-400' 
+                        : syncProgress > 0 
+                            ? 'bg-blue-500/20 text-blue-400' 
+                            : 'bg-slate-800 hover:bg-slate-700'
+                    }`}
+                >
+                    {!isOnline ? (
+                        <><CloudOff size={12} /> {t.offline} ({pendingLogs.length})</>
+                    ) : failedLogs.length > 0 ? (
+                        <><AlertTriangle size={12} /> {failedLogs.length} {t.syncError}</>
+                    ) : syncProgress > 0 ? (
+                        <><RefreshCw size={12} className="animate-spin" /> {t.syncing} {Math.round(syncProgress)}%</>
+                    ) : (
+                        <><CloudLightning size={12} /> {t.online}</>
+                    )}
+                </button>
+            )}
+            
+            <button 
+                onClick={toggleLang}
+                className="flex items-center gap-1 hover:text-white transition-colors"
+            >
+                <Globe size={14} />
+                {lang.toUpperCase()}
+            </button>
+            <div className="w-px h-4 bg-slate-700 mx-2" />
+            <button onClick={() => setUser(null)} className="flex items-center gap-1 hover:text-white transition-colors">
+                <LogOut size={14} />
+                {t.logout}
+            </button>
+          </div>
+        </div>
+  
+        {/* Content */}
+        <div className="flex-1 overflow-hidden relative">
+            {user.role === 'supervisor' ? (
+                <SupervisorDashboard onViewMobile={() => {}} lang={lang} />
+            ) : (
+                <div className="h-full overflow-y-auto bg-slate-50 max-w-md mx-auto border-x border-slate-200 shadow-2xl relative">
+                    <ManagerDashboardNew 
+                        tasks={tasks} 
+                        onStartTask={setActiveTask} 
+                        lang={lang}
+                    />
+                    
+                    {activeTask && (
+                        <LoggingScreen 
+                            task={activeTask} 
+                            onClose={() => setActiveTask(null)}
+                            onComplete={handleTaskComplete}
+                            lang={lang}
+                        />
+                    )}
+                </div>
+            )}
+        </div>
 
-const container = document.getElementById('root');
-if (container) {
-  const root = createRoot(container);
+        {/* Sync Modal */}
+        {showSyncModal && (
+            <div className="fixed inset-0 z-[60] bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+                <div className="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-hidden animate-in zoom-in-95 duration-200">
+                    <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                        <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                            <CloudLightning size={18} className="text-blue-500" />
+                            {t.syncDetails}
+                        </h3>
+                        <button onClick={() => setShowSyncModal(false)} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
+                    </div>
+                    <div className="p-4">
+                        {/* Status Toggle */}
+                        <div className="bg-slate-100 p-1 rounded-xl flex mb-6">
+                            <button 
+                                onClick={() => setIsOnline(true)}
+                                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${isOnline ? 'bg-white text-green-600 shadow-sm' : 'text-slate-400'}`}
+                            >
+                                {t.simulateOnline}
+                            </button>
+                            <button 
+                                onClick={() => setIsOnline(false)}
+                                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${!isOnline ? 'bg-white text-red-500 shadow-sm' : 'text-slate-400'}`}
+                            >
+                                {t.simulateOffline}
+                            </button>
+                        </div>
+
+                        {/* Queue Stats */}
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                            <div className="border border-slate-100 rounded-xl p-3 text-center">
+                                <div className="text-2xl font-bold text-slate-700">{pendingLogs.length}</div>
+                                <div className="text-[10px] font-bold text-slate-400 uppercase">{t.itemsPending}</div>
+                            </div>
+                            <div className="border border-red-100 bg-red-50 rounded-xl p-3 text-center">
+                                <div className="text-2xl font-bold text-red-600">{failedLogs.length}</div>
+                                <div className="text-[10px] font-bold text-red-400 uppercase">{t.itemsFailed}</div>
+                            </div>
+                        </div>
+
+                        {/* Failed Items List */}
+                        {failedLogs.length > 0 && (
+                            <div className="mb-4">
+                                <h4 className="text-xs font-bold text-red-500 uppercase mb-2">Failed Uploads</h4>
+                                <div className="space-y-2 max-h-40 overflow-y-auto">
+                                    {failedLogs.map(log => {
+                                        const task = tasks.find(t => t.id === log.taskId);
+                                        return (
+                                            <div key={log.taskId} className="flex justify-between items-center p-3 bg-red-50 rounded-lg border border-red-100">
+                                                <div>
+                                                    <div className="text-xs font-bold text-slate-700">{task?.title}</div>
+                                                    <div className="text-[10px] text-red-500 font-medium">{log.error}</div>
+                                                </div>
+                                                <button onClick={() => retryFailedLog(log.taskId)} className="p-1.5 bg-white rounded-md text-slate-500 hover:text-blue-600 shadow-sm">
+                                                    <RefreshCw size={14} />
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+
+                        <button 
+                            onClick={() => setIsOnline(prev => !prev)} // Just toggles for effect here
+                            className="w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-sm"
+                        >
+                            {isOnline ? 'Test Connection' : 'Reconnect Now'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+      </div>
+    );
+  };
+
+  const root = createRoot(document.getElementById('root')!);
   root.render(<App />);
-}
