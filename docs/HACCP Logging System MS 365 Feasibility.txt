@@ -1,0 +1,709 @@
+﻿Cafeteria Compliance System
+Functional Specification Document
+Version: 1.0
+Date: November 23, 2025
+Project Owner: District Nutrition Services Supervisor
+Stakeholders: 7 School Cafeteria Managers, TDA Compliance Team, IT Department
+________________
+
+
+1. Executive Summary
+1.1 Purpose
+This document specifies the functional requirements for a digital cafeteria compliance logging system that replaces paper-based HACCP logs across 7 school cafeterias. The system is designed to ensure TDA/USDA compliance, reduce audit preparation time, prevent data falsification, and provide real-time oversight for district supervisors.
+1.2 System Goals
+* Reduce logging time from 15-20 minutes/day to under 5 minutes
+* Eliminate missing logs through automated reminders and enforcement
+* Prevent data falsification via timestamps, geolocation, and anomaly detection
+* Enable instant audit readiness with queryable historical data
+* Provide real-time district oversight for supervisory staff
+* Achieve 95%+ on-time compliance across all sites within 90 days of rollout
+1.3 Success Metrics
+Metric
+	Baseline (Paper)
+	Target (Digital)
+	Measurement
+	On-time log completion
+	78%
+	95%
+	% of logs completed within required timeframe
+	Time per log entry
+	3-5 minutes
+	30-60 seconds
+	Average time from task start to submission
+	Missing logs per month
+	12-15
+	0-2
+	Count of logs not completed by deadline
+	Audit preparation time
+	40 hours
+	2 hours
+	Supervisor time to compile records for AR
+	Manager satisfaction
+	N/A
+	4.5/5
+	User survey after 60 days
+	________________
+
+
+2. User Roles & Permissions
+2.1 Cafeteria Manager (Primary User)
+Responsibilities:
+* Complete daily temperature, sanitation, and calibration logs
+* Document corrective actions when readings are out of range
+* Review and verify logs within their assigned school
+System Access:
+* Create and edit logs for assigned location only
+* View historical logs for their school (last 90 days)
+* Access embedded SOPs and training materials
+* Cannot delete or permanently modify submitted logs
+Authentication:
+* Unique username/password or PIN
+* Biometric option (fingerprint/face) for mobile devices
+* Auto-logout after 15 minutes of inactivity
+2.2 District Supervisor (Administrative User)
+Responsibilities:
+* Monitor compliance across all 7 schools in real-time
+* Identify and intervene on overdue or missing logs
+* Generate reports for TDA Administrative Reviews
+* Analyze trends and identify systemic issues
+* Manage user accounts and assign backups
+System Access:
+* Read-only access to all logs across all schools
+* Create and run custom queries and reports
+* View audit trails and metadata
+* Manage user permissions and school assignments
+* Place "litigation holds" on records during investigations
+Authentication:
+* Enhanced authentication (MFA recommended)
+* No auto-logout (session timeout at 2 hours)
+2.3 Substitute/Backup Staff
+Responsibilities:
+* Complete logs when primary manager is absent
+* Follow same procedures as primary manager
+System Access:
+* Temporary access to specific school location
+* All actions tagged with substitute's user ID
+* Access expires automatically after assigned coverage period
+________________
+
+
+3. Core Functional Requirements
+3.1 Manager Mobile Application
+3.1.1 Dashboard/Home Screen
+Purpose: Single-glance view of daily tasks
+Requirements:
+* FR-101: Display greeting with manager name and school location
+* FR-102: Show current day/date prominently
+* FR-103: List all pending tasks for current day with status indicators:
+   * ✓ Green = Completed
+   * ⚠️ Yellow = Due now (within next hour)
+   * ⚪ Gray = Upcoming (not yet due)
+   * 🔴 Red = Overdue
+* FR-104: Display single "Next Action" button for most urgent task
+* FR-105: Show weekly progress bar (tasks completed / total scheduled)
+* FR-106: Display percentage completion (e.g., "6/8 tasks - 75%")
+* FR-107: Sync status indicator (cloud icon with timestamp)
+* FR-108: Refresh data on pull-down gesture
+UI Constraints:
+* Maximum 3-5 tasks visible without scrolling
+* Primary action button must be minimum 44x44px
+* Must be fully functional offline (cached data)
+3.1.2 Task Notification System
+Requirements:
+* FR-110: Send push notification 30 minutes before scheduled task
+* FR-111: Send escalating reminders if task not completed:
+   * First reminder: 15 minutes after due time
+   * Second reminder: 1 hour after due time
+   * Supervisor alert: 2 hours after due time
+* FR-112: Smart notification grouping (don't send individual alerts for each task)
+* FR-113: Notification tapping opens directly to relevant task
+* FR-114: Allow user to snooze notification for 15 minutes (one time only)
+* FR-115: Daily summary notification at 7:00 AM with full day's schedule
+3.1.3 Sanitizer Test Log
+Purpose: Record chemical sanitizer concentration and corrective actions
+Data Fields:
+Field Name
+	Type
+	Required
+	Validation
+	Default
+	Timestamp
+	DateTime
+	Yes
+	Auto-captured
+	Current time
+	Location
+	Dropdown
+	Yes
+	Pre-populated list
+	"Dish Room Sink"
+	Chemical Type
+	Dropdown
+	Yes
+	"Quat", "Chlorine", "Iodine"
+	"Quat"
+	PPM Reading
+	Integer
+	Yes
+	0-1000
+	Empty
+	Temperature
+	Integer
+	Conditional
+	32-212°F
+	Empty
+	In Range
+	Boolean
+	Yes
+	Auto-calculated
+	N/A
+	Corrective Action
+	Dropdown
+	Conditional
+	Required if out of range
+	N/A
+	Photo Evidence
+	Image
+	Optional
+	Max 5MB, JPEG/PNG
+	None
+	Employee ID
+	Text
+	Yes
+	Auto-captured from login
+	Current user
+	Functional Requirements:
+* FR-120: Display context card showing:
+   * Last test result and time
+   * Current chemical type
+   * Acceptable range for current chemical
+* FR-121: Offer "Scan Test Strip" button to use camera
+* FR-122: Allow manual PPM entry via numeric keypad
+* FR-123: Validate entry in real-time against acceptable range:
+   * Quat: 272-700 ppm (per system blueprint)
+   * Chlorine: 50-100 ppm
+   * Iodine: 12.5-25 ppm
+* FR-124: If reading is IN RANGE:
+   * Show green checkmark animation
+   * Save log automatically
+   * Return to dashboard
+   * Total clicks: 2-3
+* FR-125: If reading is OUT OF RANGE:
+   * Display warning screen with yellow/red alert
+   * Show entered value vs. required range
+   * Present corrective action options:
+      * "Discarded & remixed solution"
+      * "Called maintenance"
+      * "Adjusted dispenser settings"
+      * "Other (add note)"
+   * Require corrective action selection before saving
+   * Total clicks: 4-5
+* FR-126: Capture metadata:
+   * GPS coordinates (if enabled)
+   * Device ID
+   * Entry creation timestamp
+   * Record timestamp (user-selected if backdating)
+* FR-127: Allow backdating up to 4 hours with explanation required
+* FR-128: Block submission if timestamp is in future
+* FR-129: Save draft locally if internet unavailable
+* FR-130: Sync to central database when connection restored
+Business Rules:
+* If temperature not recorded, default to "not checked"
+* Corrective actions are stored in separate related table for reporting
+* Each location can have different chemical types configured
+* System administrator can add/remove location options
+3.1.4 Refrigerator Temperature Log
+Purpose: Monitor cold holding equipment to prevent foodborne illness
+Data Fields:
+Field Name
+	Type
+	Required
+	Validation
+	Default
+	Timestamp
+	DateTime
+	Yes
+	Auto-captured
+	Current time
+	Unit Name
+	Dropdown
+	Yes
+	Pre-configured list
+	Empty
+	Temperature Type
+	Radio
+	Yes
+	"Ambient Air", "Internal Product"
+	"Ambient Air"
+	Temperature
+	Decimal
+	Yes
+	-10 to 50°F
+	Empty
+	Critical Limit
+	Integer
+	Yes
+	Auto-populated
+	41°F
+	In Range
+	Boolean
+	Yes
+	Auto-calculated
+	N/A
+	Corrective Action
+	Text
+	Conditional
+	Required if >41°F
+	N/A
+	Employee ID
+	Text
+	Yes
+	Auto-captured
+	Current user
+	Functional Requirements:
+* FR-140: Display list of all refrigeration units for the school
+* FR-141: Allow batch entry mode: select multiple units, enter temps sequentially
+* FR-142: Show last recorded temperature for each unit
+* FR-143: Highlight units not checked in last 24 hours
+* FR-144: Support voice input: "Milk cooler thirty-eight degrees"
+* FR-145: Validate against critical limit: ≤41°F (per compliance logic)
+* FR-146: If temperature >41°F:
+   * Prompt: "Check internal product temperature?"
+   * If yes, allow entry of product temp
+   * If product temp >41°F, require corrective action:
+      * "Placed on hold - evaluating safety"
+      * "Moved to working cooler"
+      * "Discarded"
+      * "Verified safe per protocol"
+* FR-147: If unit consistently >41°F for 3+ consecutive checks:
+   * Alert manager: "This unit has been out of range repeatedly. Contact maintenance?"
+   * Offer one-click maintenance request
+* FR-148: Support Bluetooth thermometer integration (optional)
+   * Auto-populate temperature from paired device
+   * Prevent manual override (to prevent falsification)
+Business Rules:
+* Morning checks should occur during "stable time" (before door opened repeatedly)
+* Afternoon checks optional but recommended for high-use sites
+* Units offline for maintenance marked "Out of Service" - no log required
+3.1.5 Warming Cabinet Temperature Log
+Purpose: Verify hot holding equipment maintains safe temperatures
+Data Fields:
+Field Name
+	Type
+	Required
+	Validation
+	Default
+	Timestamp
+	DateTime
+	Yes
+	Auto-captured
+	Current time
+	Cabinet Name
+	Dropdown
+	Yes
+	Pre-configured list
+	Empty
+	Temperature
+	Integer
+	Yes
+	32-212°F
+	Empty
+	Critical Limit
+	Integer
+	Yes
+	Auto-populated
+	140°F
+	Ready for Use
+	Boolean
+	Yes
+	Auto-calculated
+	N/A
+	Corrective Action
+	Text
+	Conditional
+	Required if <140°F
+	N/A
+	Functional Requirements:
+* FR-150: Check must occur BEFORE food is placed in cabinet
+* FR-151: Validate against critical limit: ≥140°F (per system blueprint)
+* FR-152: If temperature <140°F:
+   * Show red warning: "CABINET NOT READY"
+   * Block "Complete" button
+   * Display message: "Do not place food until cabinet reaches 140°F"
+   * Offer "Recheck" button to test again
+* FR-153: If temperature ≥140°F:
+   * Show green "READY FOR USE" confirmation
+   * Auto-save and return to dashboard
+* FR-154: Track time to reach temperature (for predictive maintenance)
+Business Rules:
+* Warming cabinets must be checked each morning before service
+* If cabinet fails to reach temperature after 30 minutes, maintenance required
+* No food may be placed in cabinet below 140°F per TFER
+3.1.6 Thermometer Calibration Log
+Purpose: Ensure measurement accuracy of all food thermometers
+Data Fields:
+Field Name
+	Type
+	Required
+	Validation
+	Default
+	Date
+	Date
+	Yes
+	Auto-captured
+	Current date
+	Thermometer ID
+	Dropdown
+	Yes
+	Pre-configured list
+	Empty
+	Calibration Method
+	Radio
+	Yes
+	"Ice Point (32°F)", "Boiling Point (212°F)"
+	"Ice Point"
+	Reading
+	Decimal
+	Yes
+	20-220°F
+	Empty
+	Acceptable Range
+	Text
+	Yes
+	Auto-populated
+	"30-34°F" or "210-214°F"
+	Status
+	Text
+	Yes
+	Auto-calculated
+	N/A
+	Action Taken
+	Dropdown
+	Conditional
+	Required if failed
+	Empty
+	Functional Requirements:
+* FR-160: Display all thermometers in inventory (manager can add/remove)
+* FR-161: Show last calibration date for each thermometer
+* FR-162: Highlight thermometers not calibrated in last 30 days
+* FR-163: Validate ice point reading: 32°F ±2°F (30-34°F acceptable)
+* FR-164: Validate boiling point reading: 212°F ±2°F (210-214°F acceptable)
+* FR-165: Auto-calculate status:
+   * "PASS" if within tolerance
+   * "FAIL" if outside tolerance
+* FR-166: If FAIL, require action:
+   * "Adjusted and re-tested"
+   * "Discarded - replaced with new unit"
+   * "Sent for repair"
+* FR-167: Track pass/fail rate per thermometer (flag unreliable units)
+* FR-168: Generate monthly summary report: X checked, Y passed, Z adjusted
+Business Rules:
+* Calibration required minimum monthly (daily recommended)
+* Failed thermometers must not be used until corrected or replaced
+* Each site should maintain minimum 3 working thermometers
+3.1.7 Receiving Log
+Purpose: Verify incoming food deliveries meet safety standards
+Data Fields:
+Field Name
+	Type
+	Required
+	Validation
+	Default
+	Timestamp
+	DateTime
+	Yes
+	Auto-captured
+	Current time
+	Vendor Name
+	Dropdown
+	Yes
+	Pre-configured list
+	Empty
+	Invoice/PO Number
+	Text
+	Yes
+	Alphanumeric
+	Empty
+	Product Description
+	Text
+	Yes
+	Free text
+	Empty
+	Product Type
+	Dropdown
+	Yes
+	"Refrigerated", "Frozen", "Dry"
+	Empty
+	Temperature
+	Integer
+	Conditional
+	Required for refrigerated/frozen
+	Empty
+	Condition Assessment
+	Checklist
+	Yes
+	Multiple options
+	Empty
+	Accept/Reject
+	Radio
+	Yes
+	"Accept", "Reject"
+	Empty
+	Reject Reason
+	Text
+	Conditional
+	Required if rejected
+	Empty
+	Functional Requirements:
+* FR-170: Support multiple products per delivery (line items)
+* FR-171: For refrigerated items, validate: ≤41°F
+* FR-172: For frozen items, validate: "Solid frozen" checkbox
+* FR-173: Condition checklist:
+   * ☐ Packaging intact
+   * ☐ No signs of pests
+   * ☐ Clean transport
+   * ☐ Proper labeling
+   * ☐ Within date code
+* FR-174: If any condition fails OR temp out of range:
+   * Auto-select "Reject"
+   * Require reject reason
+   * Capture photo of product/packaging
+   * Generate rejection notice (email to vendor)
+* FR-175: Track vendor performance:
+   * % acceptance rate
+   * Average delivery temperature
+   * Common rejection reasons
+* FR-176: Alert supervisor if vendor acceptance rate <85% over 30 days
+Business Rules:
+* All refrigerated/frozen deliveries require temperature check
+* Rejected items must be documented before leaving premises
+* Delivery logs link to inventory system (future integration)
+________________
+
+
+3.2 Supervisor Dashboard (Desktop/Tablet)
+3.2.1 District Overview Screen
+Purpose: Real-time monitoring of all schools' compliance status
+Requirements:
+* FR-200: Display all 7 schools in list/grid view
+* FR-201: For each school, show:
+   * School name
+   * Current compliance percentage (today's tasks completed)
+   * Visual progress bar (color-coded)
+   * Status indicator: ✓ Good | ⚠️ Warning | 🔴 Urgent
+   * Brief alert text (e.g., "1 overdue log", "All current")
+* FR-202: Color coding:
+   * Green: ≥90% compliance, no overdue logs
+   * Yellow: 75-89% compliance OR 1-2 overdue logs
+   * Red: <75% compliance OR 3+ overdue logs OR critical violation
+* FR-203: Update automatically every 2 minutes (configurable)
+* FR-204: 
+* Display last refresh timestamp
+* FR-205: Sort options:
+   * Alphabetical (default)
+   * Compliance score (lowest first)
+   * Alert status (urgent first)
+* FR-206: Filter options:
+   * Show all
+   * Show only warnings/urgent
+   * Show specific log types (e.g., only sanitizer logs)
+* FR-207: Summary footer showing:
+   * Total urgent items across district
+   * Total warning items across district
+   * Overall district compliance percentage
+Interaction:
+* FR-208: Clicking any school opens detailed drill-down view
+* FR-209: Hover/tap shows tooltip with additional info:
+   * Last log submitted
+   * Manager name
+   * Quick actions menu
+3.2.2 School Detail View
+Purpose: Deep dive into a single school's compliance issues
+Requirements:
+* FR-220: Display school name and current status in header
+* FR-221: Show manager name, photo (optional), contact info
+* FR-222: List all overdue/missing logs grouped by category:
+   * Critical (overdue >4 hours)
+   * Warning (overdue 1-4 hours)
+   * Due soon (within next 2 hours)
+* FR-223: For each missing log, display:
+   * Log type (e.g., "Cooler #2 Temperature")
+   * Time overdue or due time
+   * Last completed entry (date/result)
+   * Manager responsible
+* FR-224: Show compliance trend:
+   * Current week percentage
+   * Comparison to last week (↑↓ indicator)
+   * 4-week rolling average
+* FR-225: Display recent corrective actions (last 7 days):
+   * Date/time
+   * Log type
+   * Issue description
+   * Action taken
+   * Recurring issues highlighted
+* FR-226: Quick action buttons:
+   * "Call [Manager]" - initiates phone call
+   * "Send Text Reminder" - SMS to manager's mobile
+   * "Send Email" - detailed reminder with log list
+   * "View Manager Schedule" - shows assigned shifts
+   * "Assign Backup Coverage" - reassign tasks temporarily
+Business Logic:
+* FR-227: If manager has 3+ overdue logs, display warning: "Consider backup coverage"
+* FR-228: If compliance drops >10% from previous week, highlight for attention
+* FR-229: If corrective action appears 3+ times in 7 days, flag as "Recurring Issue"
+3.2.3 Reports & Analytics
+Purpose: Generate compliance reports for audits and trend analysis
+Requirements:
+* FR-240: Pre-built report templates:
+   * "TDA Administrative Review Package" - all logs for specified date range
+   * "Monthly Compliance Summary" - completion rates by school
+   * "Vendor Performance Report" - receiving log analysis
+   * "Equipment Issues Report" - temperature violations by unit
+   * "Manager Performance Report" - individual completion rates
+* FR-241: Custom query builder:
+   * Select date range (preset options: Today, This Week, This Month, Custom)
+   * Select schools (All or specific subset)
+   * Select log types (All or specific types)
+   * Select status (All, Complete, Overdue, Corrective Actions Only)
+   * Select output format (PDF, Excel, CSV)
+* FR-242: Report output includes:
+   * All relevant log entries with full metadata
+   * Photos attached to entries
+   * Audit trail (who entered, when, from what device)
+   * Summary statistics
+   * Corrective actions taken
+   * Certification statement
+* FR-243: 
+* Schedule automated reports:
+   * Daily email to supervisor (summary of previous day)
+   * Weekly email to school principals (their school only)
+   * Monthly comprehensive report to district administration
+* FR-244: One-click "TX-UNPS Export" button:
+   * Generates AR-ready documentation package
+   * Organized by review month
+   * Includes cover sheet with contact info
+   * PDF format with bookmarks for navigation
+Compliance Requirements:
+* FR-245: Reports must include disclaimer: "Generated from digital records maintained in compliance with TFER and TUETA"
+* FR-246: Reports show electronic signature information (user ID, timestamp)
+* FR-247: Reports include system audit trail confirming data integrity
+3.2.4 User Management
+Purpose: Manage staff accounts and permissions
+Requirements:
+* FR-260: View all active users with:
+   * Name
+   * Role (Manager, Supervisor, Substitute)
+   * Assigned location(s)
+   * Last login date
+   * Account status (Active, Inactive, Locked)
+* FR-261: Create new user:
+   * Enter name, email, phone
+   * Assign role
+   * Assign school location(s)
+   * Generate temporary password
+   * Send welcome email with login instructions
+* FR-262: Edit user:
+   * Change assigned location
+   * Change role
+   * Reset password
+   * Deactivate account (soft delete - preserves historical records)
+* FR-263: Assign temporary backup coverage:
+   * Select date range
+   * Assign substitute user to school
+   * Automatically expires after end date
+   * Notify both primary and substitute via email
+* FR-264: View user activity log:
+   * Login/logout events
+   * Logs submitted
+   * Failed login attempts
+   * Location changes
+________________
+
+
+3.3 Offline Capabilities
+Requirements:
+* FR-300: App functions fully without internet connection
+* FR-301: Local data storage using browser IndexedDB or device storage
+* FR-302: Cache includes:
+   * Last 7 days of completed logs
+   * All pending/scheduled tasks
+   * Reference data (equipment lists, acceptable ranges)
+   * User's assigned locations
+* FR-303: Offline indicator clearly displayed in UI
+* FR-304: Offline data entry:
+   * All forms functional
+   * Data stored locally with "pending sync" flag
+   * Timestamp captures both "record time" and "entry creation time"
+* FR-305: Automatic sync when connection restored:
+   * Upload pending logs in chronological order
+   * Retry failed uploads (3 attempts with exponential backoff)
+   * Notify user of sync completion
+   * Alert if sync fails after retries
+* FR-306: Conflict resolution:
+   * If same log edited offline by multiple users (rare), last write wins
+   * Create audit entry documenting conflict
+   * Notify supervisor of conflict for review
+* FR-307: Supervisor dashboard shows sync status:
+   * Green: All devices synced within last 5 minutes
+   * Yellow: Device offline but within acceptable range (last sync <2 hours)
+   * Red: Device offline >2 hours OR sync failures
+________________
+
+
+3.4 Data Integrity & Audit Features
+3.4.1 Metadata Capture
+Requirements:
+* FR-320: Every log entry captures:
+   * User ID (unique identifier)
+   * Record timestamp (time/date of actual observation)
+   * Entry creation timestamp (when data was entered into system)
+   * Device ID (tablet/phone identifier)
+   * GPS coordinates (if location services enabled)
+   * Wi-Fi access point (if connected)
+   * App version
+* FR-321: Metadata stored in separate table, linked to log entry
+* FR-322: Metadata visible only to supervisors (not to managers)
+* FR-323: Metadata preserved even if log entry edited
+3.4.2 Edit History & Audit Trail
+Requirements:
+* FR-330: Log entries cannot be deleted, only edited
+* FR-331: All edits preserved in version history:
+   * Original entry
+   * Edited entry
+   * User who made edit
+   * Timestamp of edit
+   * Reason for edit (required field)
+* FR-332: Version history displayed in audit trail view:
+   * Chronological list of all changes
+   * Side-by-side comparison of old vs. new values
+   * Highlighted differences
+* FR-333: Edit permissions:
+   * Managers can edit their own entries within 24 hours
+   * Managers cannot edit entries older than 24 hours
+   * Supervisors can edit any entry with documented reason
+   * All edits flagged for supervisor review
+* FR-334: Litigation hold feature:
+   * Supervisor can place hold on specific date range for a school
+   * Held records cannot be edited or archived
+   * Hold prevents automatic data retention policy from purging records
+   * Hold notation displayed on all relevant logs
+3.4.3 Anomaly Detection (AI-Powered)
+Requirements:
+* FR-340: System analyzes patterns to detect 
+* potential falsification:
+   * Temperatures exactly the same for 7+ consecutive days
+   *    * All 
+   * logs completed at exact same time of day
+   * Temps always at "perfect" value (e.g., always exactly 38°F)
+   * Entry creation timestamp patterns suggest batch entry
+   * GPS coordinates show logs entered from non-kitchen location
+* FR-341: When anomaly detected:
+   * Flag logs with "Review Recommended" status
+   * Alert supervisor via dashboard notification
+   * Generate anomaly report with statistical analysis
+   * Do NOT alert manager (to avoid tipping off intentional falsification)
+* FR-342: Anomaly dashboard for supervisors:
+   * List all flagged entries
+   * Show statistical reasoning (e.g., "38°F recorded 14 consecutive days - probability <0.01%")
+   * Allow supervisor to mark as "Reviewed - Legitimate" or "Reviewed - Suspicious"
+   * Track

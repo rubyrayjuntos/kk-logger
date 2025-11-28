@@ -1,0 +1,172 @@
+﻿Comprehensive Feasibility Study and Compliance Framework for Digital HACCP Migration in Texas School Nutrition Programs
+1. Executive Overview and Strategic Imperative
+The operational landscape of school nutrition is currently undergoing a profound transformation, driven by the convergence of rigorous federal oversight, evolving state regulations, and the urgent need for operational efficiency. For a newly appointed supervisor overseeing seven distinct school cafeteria managers, the transition from a decentralized, paper-based record-keeping system to a centralized, query-able digital database is not merely a technological upgrade—it is a strategic necessity for risk mitigation and audit readiness. The current reliance on archived paper logs creates a significant vulnerability during Administrative Reviews (AR) conducted by the Texas Department of Agriculture (TDA) and health inspections by local authorities. Paper logs are susceptible to damage, loss, illegibility, and, most critically, "dry labbing"—the falsification of data by staff who fill out logs retroactively.
+A digital migration addresses these vulnerabilities by enforcing real-time data entry, ensuring data integrity through metadata, and facilitating instant retrieval of records for auditors. However, this transition requires navigating a complex web of regulations spanning from the United States Department of Agriculture (USDA) at the federal level to the Texas Food Establishment Rules (TFER) at the state level. This report serves as a definitive guide for this migration, establishing the legal permissibility of electronic records, detailing the specific data requirements for sanitation and temperature logging, and outlining the architectural specifications for a compliant system.
+The analysis confirms that no federal or state regulation mandates the use of handwriting for Hazard Analysis and Critical Control Point (HACCP) logs. Both the USDA Food and Nutrition Service (FNS) and the TDA explicitly permit electronic record-keeping, provided the system ensures accessibility, security, and accurate retention. The challenge lies not in the legality of the medium, but in the fidelity of the process. A digital log must do more than simply replace paper; it must demonstrate "Active Managerial Control," proving that cafeteria managers are actively monitoring food safety critical control points (CCPs) rather than passively clicking buttons.
+2. The Regulatory Hierarchy and Legal Feasibility of Electronic Records
+The governance of school nutrition programs is stratified, with overlapping jurisdictions that create a dense regulatory environment. Designing a compliant database requires a nuanced understanding of how these layers interact, particularly regarding the validity of electronic records and signatures.
+2.1 Federal Authority: USDA and the HACCP Mandate
+The fundamental requirement for logging in school cafeterias stems from the Child Nutrition and WIC Reauthorization Act of 2004 (Public Law 108-265), specifically Section 111, which amended the Richard B. Russell National School Lunch Act. This legislation mandated that all School Food Authorities (SFAs) implement a food safety program based on HACCP principles. Unlike traditional health inspections that look for visible cleanliness, HACCP focuses on controlling biological, chemical, and physical hazards at specific points in the food flow.
+Under the National School Lunch Program (NSLP) regulations (7 CFR 210) and School Breakfast Program (SBP) regulations (7 CFR 220), records must be maintained to demonstrate compliance with these safety programs. The USDA has been progressive in its stance on electronic records. Policy memos and guidance documents from the Food Safety and Inspection Service (FSIS) clarify that under HACCP regulations (9 CFR 417.5) and Sanitation Standard Operating Procedures (SSOP) regulations (9 CFR 416.16), the use of computer-maintained records is entirely acceptable.
+The critical stipulation for federal compliance is data integrity and accessibility. The USDA requires that appropriate controls be implemented to ensure the integrity of electronic data and signatures. Furthermore, while records can be stored off-site (e.g., in a cloud-based central database), there is a strict requirement for retrievability. Generally, records stored off-site must be retrievable within 24 hours. However, the nuance for school cafeterias—which function as retail food establishments under local health codes—is that inspectors often demand immediate access to current logs (e.g., the last 48 hours of temperature or sanitation records) during an unannounced inspection. Therefore, any proposed central database must feature a local caching mechanism or a "store-and-forward" architecture that allows individual school sites to access and display recent logs even in the event of an internet outage.
+2.2 State Authority: Texas Department of Agriculture (TDA)
+In Texas, the TDA administers the federal nutrition programs and acts as the primary auditor for the Administrative Review. The TDA’s Administrator's Reference Manual (ARM), specifically Section 26 regarding Food Safety, reinforces the federal stance. The TDA explicitly states that Contracting Entities (CEs) have the option to maintain records on paper or electronically. This is a definitive endorsement of the digital transition you are proposing.
+However, the TDA introduces complexity regarding hybrid systems. If a school district maintains a mix of paper and electronic records—for example, digital temperature logs but paper training sign-in sheets—procedures must be developed and documented that address exactly what is stored in the external paper file and what is stored electronically. This requirement for a "roadmap" of record locations is often overlooked, leading to audit findings when a reviewer cannot locate a specific document stream.
+Furthermore, the TDA aligns its enforcement with the Texas Food Establishment Rules (TFER), which are codified in the Texas Administrative Code. The TFER adopts the FDA Food Code, which focuses on the performance of the safety check rather than the medium of the record. The TDA’s oversight emphasizes that whether the record is pixels or ink, it must be accurate, complete, and available for review during the AR.
+2.3 Legal Validity of Digital Signatures in Texas Schools
+A primary concern for supervisors migrating to digital systems is the validity of the "signature." Managers and employees are accustomed to initialing paper logs. The user query specifically asks if any part of the logs needs to be handwritten. The answer, based on a synthesis of federal and state laws, is no.
+At the federal level, the Government Paperwork Elimination Act (GPEA) and the Electronic Signatures in Global and National Commerce Act (E-SIGN) grant electronic signatures the same legal weight as handwritten ones. The USDA FNS has issued specific guidance (Policy Memo 2012) confirming that electronic signatures are acceptable for SNAP and Child Nutrition Programs provided they are unique to the signer and under their control.
+At the state level, the Texas Uniform Electronic Transactions Act (TUETA) and 1 TAC §203 mirror these federal standards. For a digital log entry in a school cafeteria to be legally valid, the system must ensure "attribution." This means the electronic record must be attributable to the person who created it. A simple shared password for a tablet (e.g., "Kitchen1") would violate this principle because it makes it impossible to distinguish which employee took a temperature.
+To meet the legal standard for a "signature" on a digital HACCP log, the database must enforce:
+1. Unique User Authentication: Every employee must have a unique login credential (username/password or PIN).
+2. Intent to Sign: The user interface should clearly indicate that entering data constitutes a formal record. For example, a prompt stating, "By submitting this log, I certify the accuracy of these temperatures," establishes the requisite intent.
+3. Audit Trail: The system must capture metadata, including the precise timestamp of the entry and the user ID, creating a non-repudiable link between the user and the record.
+2.4 Record Retention: The Five-Year Trap
+A critical insight derived from the research material is the discrepancy between federal and state retention periods. Federal regulations typically require records to be retained for three years after the submission of the final Claim for Reimbursement for the fiscal year. Many commercial food safety software platforms are configured to this 3-year standard.
+However, in Texas, the retention schedule is stricter for public entities. According to the TDA Administrator's Reference Manual and the Texas State Library and Archives Commission (TSLAC) schedules, public schools and charter schools must retain records for a minimum of five years. Private schools and Residential Child Care Institutions (RCCIs) fall under the 3-year rule, but if your district is a public entity, a 3-year purge cycle would put you in violation of state law.
+Furthermore, if there is an open audit or investigation, records must be retained indefinitely until the issue is resolved. The central database must therefore include "Litigation Hold" functionality that prevents the automated archiving or deletion of records for specific timeframes or sites under review.
+3. Designing the Digital Logbook: Specific Data Requirements
+The transition to a database allows for structured data querying, which is impossible with paper. To build a robust system, the data fields must align strictly with the monitoring requirements of the TFER and HACCP guidelines. The following sections detail the requirements for the four specific logs identified as pain points.
+3.1 The Sanitation Log: "Red and Green Buckets"
+In the school nutrition environment, the "Red and Green Bucket" system is an industry-standard best practice for preventing chemical cross-contamination. Typically, red buckets are designated for sanitizer solutions (used on food-contact surfaces), while green buckets are used for detergent (cleaning agents). While the color coding helps with visual compliance, the regulatory requirement focuses on the chemical concentration and efficacy of the solution.
+3.1.1 Chemical and Temperature Constraints
+The TFER imposes strict parameters on sanitizing solutions, which vary by the chemical agent used. The database must be intelligent enough to validate inputs based on the specific chemical selected.
+* Chlorine (Bleach): This is sensitive to water temperature and pH. The concentration must be between 50 – 100 mg/L (ppm). The water temperature must be at least 75°F (24°C) for a concentration of 50 mg/L at pH 8 or less. If the water is too hot, chlorine dissipates rapidly; if too cold, it is ineffective.
+* Quaternary Ammonium (Quat): This is the most common sanitizer in modern kitchens due to its stability. The concentration is typically 200 – 400 ppm, though the TFER defers to the manufacturer’s label instructions. Crucially, Quat requires a minimum water temperature of 75°F (24°C) to be effective. It is also sensitive to water hardness; TFER specifies it should be used in water with hardness less than 500 mg/L unless the label says otherwise.
+* Iodine: While less common, if used, it requires a concentration between 12.5 – 25 ppm.
+3.1.2 Digital Log Configuration
+To withstand a health inspection, the digital sanitation log must capture more than just a number. It requires a matrix of data points to prove efficacy.
+* Time of Test: Sanitizer strength degrades over time as organic matter (food debris) is introduced. Logs should be required at setup (e.g., 7:00 AM), mid-shift, and shift change.
+* Location: (e.g., "Dish Room," "Serving Line 1").
+* Chemical Type: A dropdown selection (Chlorine/Quat).
+* Concentration (ppm): The user enters the value from the test strip.
+* Corrective Action Logic: The system must enforce logic rules. If a user enters "10 ppm" for Chlorine (which is below the 50 ppm minimum), the system should trigger a "Corrective Action" modal. The user must select "Solution Discarded and Remixed" before the record can be saved. This proves Active Managerial Control.
+* Wiping Cloth Storage Verification: TFER §228.68(d)(2) requires that cloths in-use for wiping counters be held between uses in a chemical sanitizer solution. A checkbox field asking "Cloths stored in bucket?" reinforces this behavior at the time of logging.
+3.2 Equipment Temperature Logs: Refrigeration and Freezers
+Maintaining the "Cold Chain" is a critical control point for preventing the growth of pathogens like Listeria monocytogenes and Salmonella.
+3.2.1 Regulatory Thresholds and Monitoring
+The FDA Food Code and TFER require that Time/Temperature Control for Safety (TCS) food be maintained at 41°F (5°C) or below. For freezers, the food must be kept frozen solid, which typically implies an ambient temperature of 0°F or below, though the critical limit for food safety is effectively 32°F/41°F depending on the product state.
+A critical distinction in the regulations is between ambient air temperature and internal product temperature. An ambient air thermometer in a walk-in cooler might read 43°F during a defrost cycle or after a delivery, but the liquid temperature of the milk inside may still be a safe 39°F.
+* Database Implication: The log should allow for two types of entries: "Ambient Air" and "Internal Product." If the ambient air is high (e.g., >41°F), the system should prompt the user to perform a "Product Temp Check" using a probe thermometer to verify safety. This prevents false alarms and unnecessary food waste while documenting due diligence.
+3.2.2 Sensor Integration vs. Manual Checks
+Modern digital systems often use wireless sensors to log temperatures automatically every 15 minutes. While this provides excellent data density, it can lead to complacency. TFER and TDA audits emphasize "person-in-charge" (PIC) oversight.
+* Hybrid Approach: The most robust system uses sensors for 24/7 monitoring and alerts (e.g., sending a text if a cooler fails on a Sunday), but requires a manual verification entry once or twice a day. This manual entry proves that a human manager physically inspected the unit and verified its cleanliness and operation.
+3.2.3 Calibration Linkage
+Thermometers used to check equipment must be accurate. The database must link equipment logs to a "Calibration Log." TFER requires thermometers to be calibrated to within ±2°F (±1°C).
+* Calibration Methods: The log should track the method used: "Ice Point Method" (32°F) or "Boiling Point Method" (212°F). The user logs the reading (e.g., "32.1°F") and the system marks it as "Pass" or "Fail."
+3.3 Food Warming and Holding Logs
+Hot holding is a high-risk step, particularly for Clostridium perfringens, which thrives in the "Danger Zone" if food is allowed to cool slowly or sit at lukewarm temperatures.
+3.3.1 The "Danger Zone" and TFER Limits
+TFER §228.75(f)(3)(A) establishes the minimum hot holding temperature at 135°F (57°C). Note that older regulations utilized 140°F; the current standard is 135°F.
+3.3.2 Production vs. Holding
+The database must distinguish between "Cooking" temperatures and "Holding" temperatures, as the critical limits differ.
+* Cooking: Poultry must reach 165°F; Ground Beef 155°F.
+* Holding: All TCS foods must be held at ≥135°F.
+* Reheating: Leftovers reheated for hot holding must reach 165°F within 2 hours.
+3.3.3 Leftover Tracking (The Cooling Log)
+A sophisticated database will link the "End of Service" log to a "Cooling Log." If a manager logs that 5 pans of Lasagna are being "Saved" at the end of lunch, the system should automatically generate a pending task for "Cooling Monitoring." TFER requires cooling from 135°F to 70°F within 2 hours, and to 41°F within a total of 6 hours. A digital system that tracks these timestamps protects the district from serving unsafe leftovers.
+3.4 Receiving Logs
+Control at the loading dock is the first line of defense. The "Receiving Log" ensures that suppliers are delivering safe product.
+3.4.1 Inspection Criteria
+* Refrigerated Food: Must be received at 41°F or below.
+* Frozen Food: Must be frozen solid with no signs of thawing/refreezing (large ice crystals).
+* Packaging: Intact, no pests, clean crates.
+3.4.2 Digital Workflow
+The receiving module of the database should allow for "Accept/Reject" logic.
+* Reject Functionality: If a delivery of milk is clocked at 48°F, the user selects "Reject." The system should capture the invoice number, the vendor name, and the specific reason. This data is invaluable for the Supervisor when negotiating with vendors or proving to TDA that the district is enforcing procurement standards.
+4. Architectural Requirements for Data Integrity
+Transitioning to a digital system introduces the risk of data fabrication. It is physically easier to type a fake number than to create a fake paper trail. To counter this, the system must be designed with "Audit-Proof" integrity features.
+4.1 Metadata and the "Digital Fingerprint"
+State agencies are increasingly sophisticated in auditing digital records. The database must capture "metadata" (data about the data).
+* Creation vs. Record Time: A common scenario is a manager writing temps on a scratchpad during a rush and entering them into the computer at 2:00 PM. The system must allow the user to select the "Record Time" (e.g., 11:30 AM), but the database must privately timestamp the "Entry Creation Time" (2:00 PM). This transparency protects the district; if the creation time matches the record time perfectly for every entry every day, it suggests robotic fabrication. Variation indicates human behavior.
+* Geolocation: If mobile tablets are used, capturing GPS coordinates (or Wi-Fi access point data) proves the manager was physically in the kitchen when the log was entered, preventing remote logging from home.
+4.2 Non-Repudiation and Security
+The concept of "non-repudiation" means a user cannot deny having taken an action.
+* Credential Management: The TDA and local health departments require that the person in charge (PIC) be identifiable. Shared logins negate this.
+* Edit History: TFER records are legal documents. They should never be truly deleted. If a manager corrects an entry (e.g., fixing a typo), the database must preserve the original entry, the new entry, the time of the change, and the user who made it. This GPEA-compliant audit trail is essential for defending against liability claims.
+4.3 Offline Capabilities for Resilience
+School Wi-Fi networks can be unreliable. The USDA’s requirement for "accessibility" implies that records must be available even during outages.
+* Local Caching: The software must function as a "thick client" or Progressive Web App (PWA). Data is written to the device's local storage immediately and synchronized to the central cloud database when connectivity is restored. This ensures that a network failure does not halt food safety monitoring or prevent an inspector from viewing today's logs on the tablet itself.
+5. Administrative Review (AR) Integration and Audit Readiness
+The user’s primary pain point is the stress of the Administrative Review. The digital system should be engineered to align directly with the TDA’s AR workflow.
+5.1 The Shift to Off-Site Review
+The TDA has shifted significantly toward off-site assessment. Approximately 10-12 weeks prior to the on-site visit, the CEs are required to submit documentation via TX-UNPS.
+* The "One-Click" Report: Currently, staff must gather, organize, and scan months of paper logs. The database allows for a query-based report generation. The supervisor can execute a query for Review Month = [Last Month] and generate a consolidated, standardized PDF containing all temperature, sanitation, and receiving logs for a specific site. This not only saves hundreds of labor hours but presents a highly professional image to the state reviewer.
+5.2 Risk Assessment and Predictive Analytics
+The TDA uses a "Meal Compliance Risk Assessment Tool" to determine which sites to visit. A centralized database allows the supervisor to run internal risk assessments using similar logic.
+* Self-Auditing: By querying the database for "Missing Logs" or "Frequent Corrective Actions," the supervisor can identify which of the 7 schools is struggling before the state arrives. If School A has 100% perfect logs with zero variance (e.g., milk is always exactly 38°F), this is a statistical anomaly that suggests faked data. The supervisor can intervene proactively.
+5.3 Fiscal Action and Documentation
+Missing records equate to missing meals in the eyes of an auditor. If a school cannot prove that milk was held safely on a specific service day, the TDA may reclaim the reimbursement funds for those meals. A digital system with "Required Field" constraints prevents staff from submitting incomplete logs, thereby directly protecting the district's revenue stream.
+6. Implementation Roadmap and Change Management
+Deploying this technology across seven sites requires a structured approach to change management.
+6.1 Standardization of SOPs
+Before digitizing, the underlying Standard Operating Procedures (SOPs) must be harmonized. If School 1 calibrates thermometers on Mondays and School 2 on Fridays, the digital system will be difficult to configure. The supervisor should use this opportunity to standardize all workflows across the seven sites.
+6.2 Hardware Selection Strategy
+* Tablets vs. Kiosks: Tablets (e.g., iPads or ruggedized Android devices) are superior for HACCP logging because they allow the manager to take the device to the problem (the cooler, the receiving dock). Fixed kiosks encourage "batch entering" data away from the actual work.
+* Bluetooth Thermometers: Integrating Bluetooth probes (e.g., ThermoWorks BlueTherm) that transmit the temperature directly to the tablet eliminates transcription errors and prevents falsification, as the user cannot manually type a passing temperature if the probe reads a failing one.
+6.3 Training and Culture
+The transition must be framed as a tool for protection, not surveillance. Training should emphasize that the digital signature is a legal certification.
+* Phased Rollout: It is advisable to pilot the system at one school—ideally the one with the most tech-savvy manager—to work out workflow bugs before rolling out to all seven.
+* Double Logging: During the first two weeks of the pilot, maintaining paper logs alongside digital ones can provide a safety net and help verify that the digital system is capturing all necessary data points.
+6.4 Retention Policy Configuration
+Upon system setup, the "Data Retention Rule" must be explicitly configured to 5 Years to comply with Texas requirements for public schools. This overrides the default 3-year setting often found in commercial software. The system should be set to "Archive" rather than "Delete" after this period to maintain a permanent historical record if space permits.
+7. Conclusion
+The migration to a centralized database for school cafeteria logs is a robust, compliant, and strategic decision. Federal and state regulations not only permit but encourage the use of electronic records to enhance the accuracy and accessibility of food safety data. By implementing a system that adheres to the rigorous standards of the TFER—capturing specific chemical concentrations, precise temperature data, and unalterable audit trails—you will significantly reduce the burden of Administrative Reviews and improve the overall safety culture of the district.
+There is no legal requirement for handwritten logs. The "wet signature" is effectively replaced by unique user authentication and secure timestamping. The path forward involves selecting a solution that offers offline resilience, granular reporting for TX-UNPS integration, and strict adherence to the 5-year retention mandates of the State of Texas. This modernization will transform your role from a gatherer of paper to an analyst of data, enabling you to supervise your seven managers with unprecedented insight and efficiency.
+Data Tables and Reference Guides
+Table 1: TFER & HACCP Log Requirements for Digital Schema
+Log Type
+	Regulatory Standard (TFER/FDA)
+	Required Data Fields for Database
+	Critical Limits & Logic Rules
+	Sanitation (Buckets)
+	TFER §228.111(p), §229.165(p)
+	Date/Time, Location, Chemical Type, Concentration (ppm), Water Temp, Initial.
+	Chlorine: 50-100 ppm @ ≥75°F Quat: 200-400 ppm @ ≥75°F Corrective Action: Mandatory if out of range.
+	Cold Holding
+	TFER §228.75(f)(1)(B)
+	Unit ID, Time, Ambient Air Temp, Internal Product Temp (if air is high), Corrective Action.
+	Limit: ≤41°F (5°C). Alert: Trigger notification if >41°F for >2 hours.
+	Hot Holding
+	TFER §228.75(f)(3)(A)
+	Menu Item, Batch Time, Internal Temp, Corrective Action.
+	Limit: ≥135°F (57°C). Logic: If <135°F, prompt for "Reheat" or "Discard".
+	Cooking
+	TFER §228.71
+	Menu Item, Internal Temp, Time.
+	Poultry: 165°F Ground Meat: 155°F Pork/Fish: 145°F.
+	Cooling
+	TFER §228.75(d)
+	Start Time/Temp, 2-Hour Check, 6-Hour Check.
+	Rule 1: 135°F to 70°F in 2 hrs. Rule 2: 135°F to 41°F in 6 hrs total.
+	Receiving
+	HACCP SOP
+	Vendor, Invoice #, Product Temp, Condition, Accept/Reject.
+	Refrigerated: ≤41°F Frozen: Solid frozen. Action: Reject if thresholds unmet.
+	Thermometer Calibration
+	TFER §228.112
+	Date, Thermometer ID, Method (Ice/Boiling), Reading, Pass/Fail.
+	Ice Point: 32°F ± 2°F. Boiling Point: 212°F ± 2°F.
+	Table 2: Record Retention Schedule Comparison
+Entity Type
+	Record Type
+	Retention Period
+	Authority Source
+	Federal Agency (USDA)
+	NSLP/HACCP Records
+	3 Years (+ current year)
+	7 CFR 210.9(b)(17)
+	Texas Public/Charter School
+	NSLP/HACCP Records
+	5 Years (+ current year)
+	TDA ARM Section 30
+	Private School / RCCI
+	NSLP/HACCP Records
+	3 Years (+ current year)
+	TDA ARM Section 30
+	Audit/Litigation Hold
+	All Records
+	Indefinitely (until resolved)
+	TDA ARM Section 30
+	Works cited
+1. Guidelines on Developing a School Food Safety Program Based on ..., https://fns-prod.azureedge.us/sites/default/files/Food_Safety_HACCPGuidance.pdf 2. askFSIS Public Q&A: Electronic Records Maintained on Computers - Ask USDA, https://ask.usda.gov/s/article/Can-an-establishment-maintain-electronic-Hazard-Analysis-Critical-Control-Point-and-Standard-Operati 3. Food Safety - Square Meals, https://www.squaremeals.org/Portals/8/files/ARM/ARM_Section26_FoodSafety_230519.pdf?ver=_8LiHZIOSbnPBY8Vqt9BVw%3D%3D 4. 26 Tex. Admin. Code § 746.805 - May I keep electronic records or a combination of paper and electronic records? | State Regulations - Cornell Law School, https://www.law.cornell.edu/regulations/texas/26-Tex-Admin-Code-SS-746-805 5. Update on Electronic Transactions in the Child Nutrition Programs, https://www.fns.usda.gov/cn/update-electronic-transactions 6. Electronic Signatures Memo - USDA Food and Nutrition Service, https://www.fns.usda.gov/snap/electronic-signatures-memo 7. Ink it or Click it: Enforcing Electronic Signatures in Texas | The Bassett Firm, https://www.thebassettfirm.com/blog/2024/05/ink-it-or-click-it-enforcing-electronic-signatures-in-texas/ 8. Are Electronic Signatures Legal in Texas? - Your HelpDesk for HR, https://helpdeskforhr.com/are-electronic-signatures-legal-in-texas/ 9. Requirements for Production Records in the NSLP and SBP - CT.gov, https://portal.ct.gov/-/media/SDE/Nutrition/NSLP/Forms/ProdRecord/Requirements_Production_Records_NSLP_SBP.pdf 10. Records Retention - Square Meals, https://www.squaremeals.org/LinkClick.aspx?fileticket=AbjxXzCTEFM%3D&tabid=975&portalid=8&mid=9212 11. Local Schedule GR, Retention Schedule for Records Common to All Local Governments - Texas State Library and Archives Commission, https://www.tsl.texas.gov/slrm/localretention/schedule_gr 12. Clean and Sanitize - Culinary Cultivations, https://www.culinarycultivations.org/resources/food-safety-signs-posters/red-bucket-green-bucket-poster-portrait.html 13. Color-Coded Sanitizer and Detergent Buckets - US Foods, https://www.usfoods.com/content/dam/usf/pdf/dce/supporting_materials/EB-2017110308_MonogramBucketsBrochure%20LR.pdf 14. Sanitizer Bucket Fact Sheet - Oklahoma.gov, https://oklahoma.gov/content/dam/ok/en/health/health2/aem-documents/protective-health/consumer-health-services/food-service/tools-and-guidance/sanitizer-bucket-fact-sheet.pdf 15. Texas Food Establishment Rules Field Inspection Manual, https://www.dshs.texas.gov/sites/default/files/foodestablishments/pdf/Laws/TFERFieldInspectionManual10052015.pdf 16. Texas Food Establishment Rules - Tarrant County, https://www.tarrantcountytx.gov/content/dam/main/public-health/PH-EH/docs/TFER_Rules.pdf 17. FDA Temperature Monitoring Compliance: Essential Guide for Food Safety - SensoScientific, https://www.sensoscientific.com/fda-temperature-monitoring-compliance-food-safety/ 18. Draft Guidance for Industry: Hazard Analysis and Risk-Based Preventive Controls for Human Food - Chapter 6 - FDA, https://www.fda.gov/files/food/published/Draft-Guidance-for-Industry--Hazard-Analysis-and-Risk-Based-Preventive-Controls-for-Human-Food---Potential-Hazards-Associated-with-the-Manufacturing--Processing--Packing--and-Holding-of-Human-Food-%28Chapter-6%29-PDF.pdf 19. School HACCP Template - schoolnutritionandfitness.com, https://district.schoolnutritionandfitness.com/kleinisdnutritionandfood/files/kleinHACCP_-updated_2016.pdf 20. 0 Midway Independent School District - Amazon S3, https://s3.amazonaws.com/scschoolfiles/1043/20-22_haccp.pdf 21. RECORDS MANAGEMENT - Texas Attorney General, https://www.texasattorneygeneral.gov/sites/default/files/files/open-government/2021-conference/1_8AM_Records-Retention-Basics_Freed.pdf 22. Administrative Review - Square Meals, https://squaremeals.org/Programs/NationalSchoolLunchProgram/Compliance/AdministrativeReview.aspx 23. Administrative Review Guidance and Tools - USDA Food and Nutrition Service, https://www.fns.usda.gov/nslp/administrative-review-guidance-and-tools

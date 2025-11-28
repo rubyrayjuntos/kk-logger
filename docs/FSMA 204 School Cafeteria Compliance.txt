@@ -1,0 +1,296 @@
+﻿Strategic Compliance Assessment: FSMA 204 Applicability and the Digital Transformation of School Nutrition (2024-2028)
+
+
+
+
+1. Executive Strategic Review
+
+
+The operational landscape of school nutrition in the United States is currently undergoing a profound transformation, driven by the convergence of rigorous federal oversight, evolving state regulations, and the urgent need for operational efficiency in a post-pandemic world. For a newly appointed supervisor overseeing a district of school cafeteria managers, the question of regulatory compliance is paramount. The specific inquiry—whether school cafeterias that engage in cooking will be required to comply with the Food Safety Modernization Act (FSMA) Section 204 by 2028—touches upon a critical intersection of federal food safety jurisdiction, retail food establishment exemptions, and the specific operational definitions of "cooking" versus "manufacturing."
+Current reliance on decentralized, paper-based record-keeping systems creates significant vulnerabilities during Administrative Reviews (AR) conducted by state agencies such as the Texas Department of Agriculture (TDA) and health inspections by local authorities. Paper logs are susceptible to damage, loss, illegibility, and, most critically, "dry labbing"—the falsification of data by staff who fill out logs retroactively rather than in real-time.1 As the industry moves toward 2028, the convergence of FSMA 204 traceability pressures and existing TDA retention mandates creates a strategic necessity for migration to centralized digital databases.
+While the FSMA 204 Final Rule establishes rigorous traceability recordkeeping requirements for entities that manufacture, process, pack, or hold foods on the Food Traceability List (FTL), the prevailing regulatory consensus indicates that school cafeterias are generally exempt from these specific requirements due to their classification as "Retail Food Establishments" (RFEs). However, this exemption is not absolute. It hinges on specific operational parameters, particularly the distinction between "preparation" for direct service and "manufacturing" for distribution. Furthermore, the operational reality of the food supply chain suggests that by 2028, "de facto" compliance may be imposed by distributors and state regulators, even if the federal mandate does not explicitly apply.
+This report provides an exhaustive analysis of the regulatory environment, establishing the legal permissibility of electronic records under USDA and TDA guidelines, detailing the specific data requirements for sanitation and temperature logging that form the foundation of any future traceability program, and outlining the architectural specifications for a compliant Microsoft 365-based system. The analysis confirms that while schools may be legally exempt from generating new Traceability Lot Codes (TLCs), the modernization of their Hazard Analysis and Critical Control Point (HACCP) systems is the only viable strategy to navigate the impending era of data-driven food safety.
+
+
+2. The Regulatory Hierarchy: Federal Mandates and the Retail Exemption
+
+
+To determine the applicability of FSMA 204 to school cafeterias in 2028, one must first deconstruct the statutory framework of the rule itself and how it interfaces with the existing regulatory architecture of the Child Nutrition Programs. The governance of school nutrition is stratified, with overlapping jurisdictions that create a dense regulatory environment necessitating a nuanced understanding of how these layers interact.
+
+
+2.1 The Statutory Basis of FSMA 204
+
+
+The FSMA 204 Final Rule, titled "Requirements for Additional Traceability Records for Certain Foods," is designed to enable faster identification and removal of potentially contaminated food from the market. It applies to persons who manufacture, process, pack, or hold foods included on the Food Traceability List (FTL). The core objective is to maintain a continuous digital thread of data—Key Data Elements (KDEs) linked to Critical Tracking Events (CTEs)—facilitating rapid traceback during outbreaks.
+The Food Traceability List includes commodities that are ubiquitous in school nutrition programs, such as fresh leafy greens, melons, tomatoes, peppers, cucumbers, fresh-cut fruits and vegetables, shell eggs, nut butters, and soft cheeses.1 Because school cafeterias, particularly those that cook from scratch, handle these ingredients daily, they fall within the scope of the commodities covered by the rule. The pivotal question is whether the entity—the school cafeteria—is subject to the recordkeeping mandates.
+
+
+2.2 The Retail Food Establishment (RFE) Exemption
+
+
+The central pillar of the argument against mandatory compliance for school cafeterias lies in the definition of a "Retail Food Establishment" (RFE). Under 21 CFR 1.227, a Retail Food Establishment is defined as an establishment that sells food products directly to consumers as its primary function. The definition explicitly includes grocery stores, convenience stores, and vending machine locations. Crucially, the definition also encompasses "restaurants," which are further defined to include cafeterias, lunchrooms, and catering facilities.
+The FSMA 204 Final Rule includes a specific exemption for Retail Food Establishments with respect to the requirement to maintain Key Data Elements (KDEs) for certain Critical Tracking Events (CTEs). Specifically, § 1.1305(j) of the rule states that the requirements do not apply to retail food establishments with respect to foods they receive directly from a distributor or supplier, provided certain conditions are met. While RFEs are the final node in the supply chain, the burden of traceability largely stops at their receiving dock in terms of passing forward data. They are not required to generate "Shipping KDEs" because they are selling to the final consumer—the student—not another business entity.
+The rationale behind this exemption is practical. Imposing complex "Transformation" recordkeeping on retail outlets, where staff focus on immediate service, would be operationally paralyzing. However, RFEs are subject to "Receiving KDEs" to a limited extent. The rule mandates that when an RFE receives a food on the FTL, they must maintain records containing specific information linked to the Traceability Lot Code (TLC). This implies that even if a school cafeteria is exempt from generating complex shipping data, it theoretically must maintain the traceability data sent to it by its suppliers.
+
+
+2.3 The "Cooking" Distinction: Preparation vs. Manufacturing
+
+
+The user's query specifically highlights "cafeterias that cook." This distinction is vital because FSMA 204 applies to "manufacturing/processing." If a school cafeteria's "cooking" activities were reclassified as "manufacturing," the exemption would vanish. In the context of FSMA, "manufacturing/processing" involves making food from one or more ingredients, or synthesizing, preparing, treating, modifying, or manipulating food. Examples include cutting, peeling, trimming, washing, cooking, baking, mixing, and packaging.
+On the surface, a school cafeteria engaging in scratch cooking—for example, making lasagna from raw ground beef, pasta, and cheese—appears to be "manufacturing." However, the FDA distinguishes between manufacturing for distribution and preparation for direct consumption. If the food prepared (cooked) in the cafeteria is sold or served directly to the consumer (the student) at that location, the activity is considered part of the "Retail Food Establishment" operation. It is classified as "preparation," not "manufacturing" in the supply chain sense. Therefore, a stand-alone school kitchen that cooks meals for its own students remains an RFE and enjoys the exemptions provided to restaurants.
+
+
+2.4 The Central Kitchen Complication
+
+
+The scenario becomes significantly more complex for school districts utilizing a Central Kitchen (CK) model. If a Central Kitchen cooks food (e.g., makes 500 gallons of chili) and then cools, packs, and ships it to 10 satellite elementary schools, the Central Kitchen is no longer acting solely as a retail establishment serving a consumer. It is engaging in "Shipping" to other locations.
+Under strict FSMA 204 interpretation, if the Central Kitchen is held to be a "manufacturer" or "distributor" because the primary sale to the consumer happens at the satellite site, not the CK, then the Central Kitchen might be required to assign Traceability Lot Codes (TLCs) to the produced chili, maintain "Transformation KDEs" (linking the lot codes of the ingredients—beef, beans, tomatoes—to the new TLC of the chili), and send "Shipping KDEs" to the satellite schools.
+While existing definitions of RFE often allow for a certain amount of off-site sales or distribution within the same business entity without losing the RFE status, this is the specific area where regulatory interpretation could tighten by 2028. If the FDA decides that large-scale central kitchens function identically to commercial commissaries, the "cooking" aimed at satellite distribution could trigger full FSMA 204 compliance.
+
+
+3. The Digital Transformation of HACCP: A Prerequisite for Future Readiness
+
+
+While the legal exemption offers a shield against FSMA 204, the operational imperative to modernize record-keeping remains. The transition from a decentralized, paper-based system to a centralized, query-able digital database is a strategic necessity for risk mitigation and audit readiness. The current reliance on archived paper logs creates a significant vulnerability during Administrative Reviews. Paper logs are susceptible to damage, loss, and illegibility. Most critically, they enable "dry labbing," where staff fill out logs retroactively rather than recording data in real-time.1
+A digital migration addresses these vulnerabilities by enforcing real-time data entry, ensuring data integrity through metadata, and facilitating instant retrieval of records for auditors. This transition requires navigating a complex web of regulations spanning from the USDA at the federal level to the TDA at the state level.
+
+
+3.1 Legal Permissibility of Electronic Records
+
+
+A primary concern for supervisors migrating to digital systems is the legal validity of electronic records and signatures. The analysis of relevant statutes confirms that no federal or state regulation mandates the use of handwriting for HACCP logs. Both the USDA Food and Nutrition Service (FNS) and the TDA explicitly permit electronic record-keeping, provided the system ensures accessibility, security, and accurate retention.1
+At the federal level, the Government Paperwork Elimination Act (GPEA) and the Electronic Signatures in Global and National Commerce Act (E-SIGN) grant electronic signatures the same legal weight as handwritten ones. The USDA FNS has issued specific guidance (Policy Memo 2012) confirming that electronic signatures are acceptable for Child Nutrition Programs provided they are unique to the signer and under their control.1
+At the state level, the Texas Uniform Electronic Transactions Act (TUETA) and 1 TAC §203 mirror these federal standards. For a digital log entry in a school cafeteria to be legally valid, the system must ensure "attribution." This means the electronic record must be attributable to the person who created it. A simple shared password for a tablet (e.g., "Kitchen1") would violate this principle because it makes it impossible to distinguish which employee took a temperature. To meet the legal standard for a "signature" on a digital HACCP log, the database must enforce unique user authentication, intent to sign, and a rigorous audit trail.1
+
+
+3.2 The Retention Schedule Discrepancy: The Five-Year Trap
+
+
+A critical insight derived from the research material is the discrepancy between federal and state retention periods. This is the single most common failure point in off-the-shelf digital implementations. Federal regulations typically require records to be retained for three years after the submission of the final Claim for Reimbursement for the fiscal year. Many commercial food safety software platforms are configured to this 3-year standard.
+However, in Texas, the retention schedule is stricter for public entities. According to the TDA Administrator's Reference Manual and the Texas State Library and Archives Commission (TSLAC) schedules, public schools and charter schools must retain records for a minimum of five years.1 Private schools and Residential Child Care Institutions (RCCIs) fall under the 3-year rule, but for public entities, a 3-year purge cycle constitutes a violation of state law. Furthermore, if there is an open audit or investigation, records must be retained indefinitely until the issue is resolved. This necessitates "Litigation Hold" functionality within the digital system to prevent automated archiving or deletion of records for specific timeframes or sites under review.1
+
+
+3.3 Microsoft 365 Architecture for Compliance
+
+
+The proposed architecture utilizes the existing Microsoft 365 investment to create a bespoke, enterprise-grade HACCP management system. This approach avoids the recurring licensing fees of proprietary SaaS platforms while offering superior flexibility to adapt to specific Texas state retention mandates. By leveraging SharePoint as a robust backend, Power Apps as a logic-driven frontend, and Power BI as an analytical auditing tool, the district can transform its food safety culture from one of reactive compliance to proactive quality assurance.1
+SharePoint Online serves as the backend database. To handle the volume of records generated by seven schools over five years (estimated at over 65,000 records), the architecture must utilize Indexed Columns and Folder Partitioning to manage the "List View Threshold" of 5,000 items. Security trimming is essential; a cafeteria manager at School A should not be able to edit or potentially view the logs of School B. This isolation is critical for data integrity and is achieved through Item-Level or Folder-Level Security.1
+Power Apps functions as the "Active Managerial Control" interface. It must operate as a "thick client" capable of offline operation. School kitchens often have dead zones, particularly inside walk-in freezers which act as Faraday cages. The Power App must cache data locally using SaveData() and LoadData() functions and synchronize with the central database when connectivity is restored. This ensures that a network failure does not halt food safety monitoring or prevent an inspector from viewing today's logs on the tablet itself.1
+Power Automate acts as the workflow engine, triggering immediate alerts if a critical control point is breached (e.g., a freezer temperature rising above 32°F) and managing scheduled notifications for missing logs. Power BI provides the compliance dashboard, replacing physical binder reviews with trend analysis and "Administrative Review Export" functionality that formats digital data into traditional log layouts for state inspectors.1
+
+
+4. Specific Data Requirements for Digital Logging
+
+
+The transition to a database allows for structured data querying, which is impossible with paper. To build a robust system, the data fields must align strictly with the monitoring requirements of the Texas Food Establishment Rules (TFER) and HACCP guidelines.
+
+
+4.1 The Sanitation Log: Chemical Precision
+
+
+In the school nutrition environment, the "Red and Green Bucket" system is an industry-standard best practice for preventing chemical cross-contamination. Red buckets are designated for sanitizer solutions (used on food-contact surfaces), while green buckets are used for detergent. While the color coding helps with visual compliance, the regulatory requirement focuses on the chemical concentration and efficacy of the solution.
+The TFER imposes strict parameters on sanitizing solutions, which vary by the chemical agent used. The database must be intelligent enough to validate inputs based on the specific chemical selected.
+For Chlorine (Bleach), efficacy is sensitive to water temperature and pH. The concentration must be maintained between 50-100 mg/L (ppm). The water temperature must be at least 75°F (24°C) for a concentration of 50 mg/L at pH 8 or less. If the water is too hot, chlorine dissipates rapidly; if too cold, it is ineffective.1
+For Quaternary Ammonium (Quat), which is the most common sanitizer in modern kitchens due to its stability, the parameters are different. The research specifies the use of "Ecolab S&S Sanitizer".1 The concentration requirement for this specific chemical is 0.27 - 0.55 oz/gal, which correlates to 272 - 700 ppm. A crucial temperature constraint highlights that the testing solution should be at or above room temperature, specifically 65°F (18.3°C) or above. TFER generally recommends 75°F for Quats, but the manufacturer's label takes precedence. The system must enforce this lower limit and also account for water hardness, which should be less than 500 mg/L unless the label specifies otherwise.1
+To withstand a health inspection, the digital sanitation log must capture a matrix of data points to prove efficacy. This includes the dispenser location, time of test (setup, mid-shift, shift change), chemical type, concentration (ppm), and temperature verification. The system must enforce corrective action logic: if a user enters "150 ppm" for Quat (requiring 272-700 ppm), the system should trigger a modal requiring "Solution Discarded and Remixed" or "Dispenser Calibrated" before the record can be saved.1
+
+
+4.2 Equipment Temperature Logs: The Cold Chain
+
+
+Maintaining the "Cold Chain" is a critical control point for preventing the growth of pathogens like Listeria monocytogenes and Salmonella. The FDA Food Code and TFER require that Time/Temperature Control for Safety (TCS) food be maintained at 41°F (5°C) or below. For freezers, the food must be kept frozen solid. While the industry standard for food quality in freezers is 0°F or below, the critical limit for safety is that the food remains frozen.1
+A critical distinction in the regulations is between ambient air temperature and internal product temperature. An ambient air thermometer in a walk-in cooler might read 43°F during a defrost cycle or after a delivery, but the liquid temperature of the milk inside may still be a safe 39°F. The digital log should allow for two types of entries: "Ambient Air" and "Internal Product." If the ambient air is high (e.g., >41°F), the system should prompt the user to perform a "Product Temp Check" using a probe thermometer to verify safety. This prevents false alarms and unnecessary food waste while documenting due diligence.1
+The "Frozen to Touch" protocol for freezers introduces a specific qualitative check. This is a distinct data field from the air temperature. If "Food Frozen to Touch" is unchecked, the system must immediately guide the user to a corrective action workflow involving a probe thermometer check. The system must also handle the "Stable Time" requirement, advising that readings be taken when the unit is stable, such as early morning, rather than during heavy use periods like lunch service.1
+
+
+4.3 Food Warming and Holding Logs
+
+
+Hot holding is a high-risk step, particularly for Clostridium perfringens, which thrives in the "Danger Zone" if food is allowed to cool slowly or sit at lukewarm temperatures. TFER §228.75(f)(3)(A) establishes the minimum hot holding temperature at 135°F (57°C). Note that older regulations utilized 140°F; the current standard is 135°F, though many schools maintain a 140°F standard as a safety buffer.1
+The Warming Cabinet Log contains a crucial procedural instruction: "Warming cabinet temperature should be verified at or above 140°F (60°C) before placing food into warming cabinet." This is a preventative control. The Power App can enforce this sequence by locking the "Lunch Service" module until a "Warming Cabinet Pre-Check" log has been submitted showing a compliant temperature. This forces staff to adhere to the SOP of pre-heating equipment.1
+The database must distinguish between "Cooking" temperatures (Poultry at 165°F, Ground Beef at 155°F) and "Holding" temperatures (≥135°F). It should also link the "End of Service" log to a "Cooling Log." If leftovers are saved, the system automatically generates pending tasks for cooling monitoring, tracking the requirement to cool from 135°F to 70°F within 2 hours, and to 41°F within a total of 6 hours.1
+
+
+4.4 Thermometer Calibration Logs
+
+
+Thermometers used to check equipment must be accurate. The database must link equipment logs to a "Calibration Log." TFER requires thermometers to be calibrated to within ±2°F (±1°C). The log provides specific procedural details for the "Ice Point Method," noting the critical ratio of "50% crushed ice and 50% water" (or 60%/40% for cubed ice) to create a true 32°F environment. The app can include a visual guide or checklist for this preparation. Logic rules should mark thermometers as "Adjusted" or "Discarded" based on the reading, flagging any device that repeatedly fails for replacement.1
+
+
+5. Architectural Integrity and Security
+
+
+Transitioning to a digital system introduces the risk of data fabrication. To counter this, the system must be designed with "Audit-Proof" integrity features. State agencies are increasingly sophisticated in auditing digital records, necessitating the capture of comprehensive metadata.
+
+
+5.1 Metadata and Non-Repudiation
+
+
+A common scenario involves a manager writing temperatures on a scratchpad during a rush and entering them into the computer hours later. The system must allow the user to select the "Record Time" (e.g., 11:30 AM), but the database must privately timestamp the "Entry Creation Time" (2:00 PM). This transparency protects the district; perfect matches between creation and record times across all entries suggest robotic fabrication, while variation indicates authentic human behavior.1
+Geolocation adds another layer of integrity. If mobile tablets are used, capturing GPS coordinates or Wi-Fi access point data proves the manager was physically in the kitchen when the log was entered, preventing remote logging from home.
+Non-repudiation ensures a user cannot deny having taken an action. This relies on strict credential management; shared logins negate this principle. TFER records are legal documents and should never be truly deleted. If a manager corrects an entry, the database must preserve the original entry, the new entry, the time of the change, and the user who made it, creating a GPEA-compliant audit trail essential for defending against liability claims.1
+
+
+6. The 2028 Outlook: Commercial Compliance and Hybrid Models
+
+
+Even if school cafeterias remain legally exempt from the explicit letter of FSMA 204 in 2028, the operational environment will likely force a "de facto" compliance. This phenomenon, often termed "commercial compliance," occurs when the upstream supply chain standardizes to FSMA 204 standards and expects customers to receive data in compatible formats.
+
+
+6.1 Distributor Pressure and Data Streams
+
+
+Distributors will be the primary bearers of the FSMA 204 burden. They must pass Traceability Lot Codes and associated Key Data Elements to their customers. By 2028, broadline distributors will have overhauled their ERP systems to automate this data transfer. When a school cafeteria receives a delivery of romaine lettuce (an FTL item), the digital invoice or Advanced Shipping Notice (ASN) will contain the FSMA 204 data.
+Even if the school is not legally required by the FDA to store this data for 2 years in a specific format, the commercial reality is that the data will be pushed to them. If a recall occurs, the expectation from public health officials and parents will be that the school can instantly trace the contaminated lot. Adopting "best practice" standards will likely evolve to include maintaining FSMA 204 receiving data, regardless of the strict regulatory mandate.
+
+
+6.2 State Regulatory Evolution (TDA)
+
+
+State regulations often lag federal ones but eventually align. TFER currently adopts the FDA Food Code. As the FDA Food Code is updated to reflect FSMA principles, TFER will follow suit. While TFER currently focuses on HACCP, future iterations by 2028 may incorporate traceability elements. The "Active Managerial Control" concept emphasizes proactive risk management; it is a logical progression for state regulators to view traceability as a component of this control.
+Furthermore, digital systems adopted to prevent "dry labbing" are the same platforms needed to store traceability data. If a district has digitized its HACCP logs to meet TDA retention rules, integrating FSMA 204 data fields (Lot Code, Source Location) into the "Receiving Log" is a minor technical adjustment that yields significant compliance dividends.1
+
+
+6.3 The Hybrid "Traceability-Enhanced HACCP"
+
+
+The "cooking" aspect increases the food safety risk profile. Cooking is a Critical Control Point. In 2028, it is plausible that while the FDA might not require the creation of new lot codes (Transformation KDEs), they or the USDA might tighten the requirement to link input lot codes to the production log.
+In a scenario where a student falls ill from E. coli after eating tacos, the current requirement is to show the cooking log proving the meat reached 155°F. A potential 2028 expectation would be to show the cooking log proving the temperature and identifying which specific deliveries of ground beef were used. This "linkage" represents a hybrid "Traceability-Enhanced HACCP" that is likely to become the standard of care.
+
+
+7. Strategic Recommendations and Implementation Roadmap
+
+
+Given that strict legal mandates are unlikely but operational pressure is certain, school districts should adopt a strategy of "Voluntary Alignment" rather than "Mandatory Compliance."
+
+
+7.1 Digital HACCP as the Bridge
+
+
+The migration to Microsoft 365 for HACCP logging should be designed to handle receiving data. When building the "Receiving Log" in Power Apps, optional fields for "Lot Number" and "Brand/Source" should be included. This conditions staff to look for this data and makes it searchable in the event of a recall, moving the district from reactive to proactive without requiring a full ERP overhaul.1
+
+
+7.2 Strengthening the Receiving Control Point
+
+
+The "Receiving Log" is the first line of defense. Standard Operating Procedures (SOPs) should be strengthened so that staff are trained to verify that the product label matches the invoice description exactly, rather than just checking temperatures. By 2028, districts should request ASNs from distributors that can be ingested into the school's inventory system, automating the capture of Lot Codes without manual entry.1
+
+
+7.3 Policy vs. Practice
+
+
+School boards should be advised not to write full FSMA 204 compliance into district policy to avoid self-imposed liability. Instead, the policy stance should remain that the district complies with USDA/TDA regulations. Internally, however, the district should adopt the practice of preserving lot identity where feasible, such as through strict "First-In, First-Out" inventory management.
+
+
+7.4 Implementation Roadmap
+
+
+Deploying this technology across seven sites requires a structured approach. First, SOPs must be harmonized; if schools calibrate thermometers on different days or use different sanitizers, the digital system will be difficult to configure. Standardization of the "Ice Point" method and specific chemical types is a prerequisite.1
+Hardware selection is also critical. Tablets are superior to fixed kiosks for HACCP logging as they allow the manager to take the device to the problem. Integrating Bluetooth probes that transmit temperature directly to the tablet eliminates transcription errors and prevents falsification.
+The rollout should be phased, piloting the system at one school to resolve workflow bugs. A period of "Double Logging"—maintaining paper logs alongside digital ones—can provide a safety net and verify that the digital system captures all necessary data points. Finally, the "Data Retention Rule" in the system must be explicitly configured to 5 Years to comply with Texas requirements for public schools, overriding the default 3-year setting often found in commercial software.1
+
+
+8. Conclusion
+
+
+The question of whether school cafeterias that cook will be required to comply with FSMA 204 in 2028 yields a nuanced answer. Legally, under current FDA regulations and definitions, individual school cafeterias are classified as "Retail Food Establishments" and are exempt from the requirement to maintain Key Data Elements for Critical Tracking Events. The act of "cooking" for direct service to students is considered retail preparation, not manufacturing.
+However, operationally, the food supply chain of 2028 will function on FSMA 204 data standards. Distributors will push traceability data to schools, and state regulators will increasingly expect schools to utilize this data to demonstrate Active Managerial Control. While schools may not be fined by the FDA for failing to generate new Lot Codes, they face potential citations from the TDA or local health departments if they cannot demonstrate the source of food during an outbreak investigation.
+Therefore, the strategic path forward is not to aim for FSMA 204 compliance, but for Digital HACCP Maturity. By implementing a robust, centralized Microsoft 365-based system that adheres to TFER standards—capturing specific chemical concentrations, precise temperatures, and unalterable audit trails—school districts can build the data infrastructure necessary to navigate the traceability-rich environment of the future. This approach satisfies current strict 5-year state retention mandates while effectively "future-proofing" the district against operational pressures, transforming the role of the supervisor from a gatherer of paper to an analyst of data.
+________________
+Table 1: TFER & HACCP Log Requirements for Digital Schema
+Log Type
+	Regulatory Standard (TFER/FDA)
+	Required Data Fields for Database
+	Critical Limits & Logic Rules
+	Sanitation (Buckets)
+	TFER §228.111(p), §229.165(p)
+	Date/Time, Location, Chemical Type, Concentration (ppm), Water Temp, Initial.
+	Chlorine: 50-100 ppm @ ≥75°F (pH ≤8).
+
+
+Quat (Ecolab): 272-700 ppm @ ≥65°F.
+
+
+Corrective Action: Mandatory if out of range.
+	Cold Holding
+	TFER §228.75(f)(1)(B)
+	Unit ID, Time, Ambient Air Temp, Internal Product Temp (if air is high), Corrective Action.
+	Limit: ≤41°F (5°C).
+
+
+Freezer: Frozen Solid (Food Frozen to Touch).
+
+
+Alert: Trigger notification if >41°F for >2 hours.
+	Hot Holding
+	TFER §228.75(f)(3)(A)
+	Menu Item, Batch Time, Internal Temp, Corrective Action.
+	Limit: ≥135°F (57°C).
+
+
+Pre-Check: Warming cabinet ≥140°F before use.
+
+
+Logic: If <135°F, prompt for "Reheat" or "Discard".
+	Cooking
+	TFER §228.71
+	Menu Item, Internal Temp, Time.
+	Poultry: 165°F.
+
+
+Ground Meat: 155°F.
+
+
+Pork/Fish: 145°F.
+	Cooling
+	TFER §228.75(d)
+	Start Time/Temp, 2-Hour Check, 6-Hour Check.
+	Rule 1: 135°F to 70°F in 2 hrs.
+
+
+Rule 2: 135°F to 41°F in 6 hrs total.
+	Receiving
+	HACCP SOP
+	Vendor, Invoice #, Product Temp, Condition, Accept/Reject.
+	Refrigerated: ≤41°F.
+
+
+Frozen: Solid frozen.
+
+
+Action: Reject if thresholds unmet.
+	Thermometer Calibration
+	TFER §228.112
+	Date, Thermometer ID, Method (Ice/Boiling), Reading, Pass/Fail.
+	Ice Point: 32°F ± 2°F (50/50 Ice/Water Ratio).
+
+
+Boiling Point: 212°F ± 2°F.
+	Table 2: Record Retention Schedule Comparison
+Entity Type
+	Record Type
+	Retention Period
+	Authority Source
+	SharePoint Config
+	Federal Agency (USDA)
+	NSLP/HACCP Records
+	3 Years (+ current year)
+	7 CFR 210.9(b)(17)
+	Default Label
+	Texas Public/Charter School
+	NSLP/HACCP Records
+	5 Years (+ current year)
+	TDA ARM Section 30
+	Custom Label (Required)
+	Private School / RCCI
+	NSLP/HACCP Records
+	3 Years (+ current year)
+	TDA ARM Section 30
+	Default Label
+	Audit/Litigation Hold
+	All Records
+	Indefinitely (until resolved)
+	TDA ARM Section 30
+	Legal Hold Case
+	Works cited
+1. School Cafeteria Log Requirements Research.docx
