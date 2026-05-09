@@ -24,10 +24,10 @@ import {
   Mail
 } from 'lucide-react';
 import { Button } from '../../../components/common/Button';
-import type { Language, Manager, School } from '../../../shared/types/core';
+import type { Language, SessionUser, School } from '../../../shared/types/core';
 
 interface ManagerReportDashboardProps {
-  currentUser: Manager;
+  currentUser: SessionUser;
   lang: Language;
   schools?: School[];
 }

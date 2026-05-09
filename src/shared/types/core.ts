@@ -188,6 +188,24 @@ export interface User {
   modifiedDate: string;
 }
 
+// Lightweight session/auth user used across UI components
+export interface SessionUser {
+  id: string;
+  username: string;
+  role: UserRole;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber?: string;
+  schoolCode: string;
+  language: Language;
+  isActive: boolean;
+  hireDate: string;
+  lastLoginDate: string;
+  requiredTrainingComplete: boolean;
+  permissions: string[];
+}
+
 export interface SchoolIssue {
   id: number;
   title: string;

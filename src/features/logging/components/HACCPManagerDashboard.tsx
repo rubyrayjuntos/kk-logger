@@ -24,10 +24,10 @@ import {
 } from 'lucide-react';
 import { Button } from '../../../components/common/Button';
 import { ExceptionTrainingModal, ContextualHelpButton } from '../../training/components/TrainingSystem';
-import type { Language, Manager, TrainingRecord } from '../../../shared/types/core';
+import type { Language, SessionUser, TrainingRecord } from '../../../shared/types/core';
 
 interface HACCPManagerDashboardProps {
-  currentUser: Manager;
+  currentUser: SessionUser;
   lang: Language;
   onTrainingComplete: () => void;
 }

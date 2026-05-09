@@ -3,11 +3,11 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { HACCPManagerDashboard } from '../features/logging/components/HACCPManagerDashboard';
-import { ManagerReportDashboard } from '../features/reporting/components/ManagerReportDashboard';
-import { AdminDashboard } from '../features/admin/components/AdminDashboard';
-import { OnboardingTour } from '../features/training/components/TrainingSystem';
-import type { Language, Manager, UserRole } from '../shared/types/core';
+import { HACCPManagerDashboard } from './features/logging/components/HACCPManagerDashboard';
+import { ManagerReportDashboard } from './features/reporting/components/ManagerReportDashboard';
+import { AdminDashboard } from './features/admin/components/AdminDashboard';
+import { OnboardingTour } from './features/training/components/TrainingSystem';
+import type { Language, SessionUser } from './shared/types/core';
 
 interface HACCPAppProps {}
 
@@ -17,7 +17,7 @@ interface LoginCredentials {
 }
 
 // Mock user database - in real app, this would be from API
-const MOCK_USERS: (Manager & { username: string; password: string })[] = [
+const MOCK_USERS: (SessionUser & { username: string; password: string })[] = [
   {
     id: 'user-1',
     username: 'maria.rodriguez',
@@ -89,7 +89,7 @@ const MOCK_USERS: (Manager & { username: string; password: string })[] = [
 ];
 
 export const HACCPApp: React.FC<HACCPAppProps> = () => {
-  const [currentUser, setCurrentUser] = useState<Manager | null>(null);
+  const [currentUser, setCurrentUser] = useState<SessionUser | null>(null);
   const [language, setLanguage] = useState<Language>('en');
   const [currentView, setCurrentView] = useState<'dashboard' | 'reports' | 'admin'>('dashboard');
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -150,7 +150,7 @@ export const HACCPApp: React.FC<HACCPAppProps> = () => {
     }
     
     // Create user session (exclude password from stored data)
-    const { password, username, ...userSession } = user;
+    const { password, ...userSession } = user;
     setCurrentUser(userSession);
     
     // Update last login

@@ -21,16 +21,16 @@ import { Button } from '../../../components/common/Button';
 import { UserManagement } from './UserManagement';
 import { BulkOperations } from './BulkOperations';
 import { TrainingDashboard } from '../../training/components/TrainingSystem';
-import type { 
+import type {
   School as SchoolType,
-  Manager, 
-  UserRole, 
+  SessionUser,
+  UserRole,
   Language,
-  TrainingRecord 
+  TrainingRecord
 } from '../../../shared/types/core';
 
 interface AdminDashboardProps {
-  currentUser: Manager;
+  currentUser: SessionUser;
   lang: Language;
 }
 
@@ -56,7 +56,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   lang 
 }) => {
   const [activeView, setActiveView] = useState<'overview' | 'users' | 'training' | 'schools' | 'settings'>('overview');
-  const [selectedUsers, setSelectedUsers] = useState<Manager[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<SessionUser[]>([]);
   const [showBulkOps, setShowBulkOps] = useState(false);
   const [metrics, setMetrics] = useState<SystemMetrics | null>(null);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
